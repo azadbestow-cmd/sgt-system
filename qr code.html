@@ -3,305 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGT Enterprise Master System</title>
+    <title>Softwire Enterprise Identity System</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; text-align: center; background-color: #f0f2f5; padding: 10px; margin: 0; color: #333; }
-        .container { max-width: 480px; margin: auto; background: white; padding: 15px; border-radius: 16px; box-shadow: 0px 8px 30px rgba(0,0,0,0.08); }
-        h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 0 0 15px 0; letter-spacing: 0.5px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; background-color: #f0f2f5; padding: 15px; margin: 0; }
+        .container { max-width: 450px; margin: auto; background: white; padding: 20px; border-radius: 16px; box-shadow: 0px 4px 20px rgba(0,0,0,0.08); }
+        input, select { width: 100%; box-sizing: border-box; padding: 11px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; }
+        .phone-container { display: flex; gap: 8px; margin-bottom: 10px; }
+        .phone-code { width: 25%; padding: 11px; border: 1px solid #ccc; border-radius: 8px; background: #eee; font-weight: bold; text-align: center; }
+        .phone-num { flex: 1; padding: 11px; border: 1px solid #ccc; border-radius: 8px; }
+        button { background-color: #1e3c72; color: white; border: none; padding: 12px; font-size: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
+        .panel { display: none; margin-top: 20px; text-align: left; padding: 15px; border: 1px solid #e0e0e0; border-radius: 12px; background: #fafafa; }
         
-        /* Form Styling */
-        input, select { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; transition: 0.2s; }
-        input:focus { border-color: #1e3c72; outline: none; box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1); }
-        .phone-container { display: flex; gap: 8px; width: 100%; margin-bottom: 10px; }
-        .phone-code { width: 25%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #f8f9fa; font-weight: 700; text-align: center; color: #555; }
-        .phone-num { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
-        button { color: white; border: none; padding: 12px 20px; font-size: 15px; border-radius: 8px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 5px; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; }
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-create { background-color: #1e3c72; }
-        .btn-wapp { background-color: #25D366; }
-        .btn-flip { background-color: #6c757d; }
+        /* TWO-SIDED PRINTABLE CR80 ID CARD */
+        .badge-wrapper { display: none; margin-top: 20px; }
+        .cards-print-container { display: flex; flex-direction: column; gap: 20px; align-items: center; margin-top: 15px; }
+        .id-card { width: 340px; height: 215px; background: white; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.1); box-sizing: border-box; position: relative; overflow: hidden; border: 1px solid #ddd; text-align: left; }
         
-        .panel { display: none; margin-top: 20px; text-align: left; padding: 20px; border: 1px solid #eee; border-radius: 12px; background: #fafafa; }
-        .upload-label { font-size: 12px; font-weight: bold; color: #666; display: block; margin-bottom: 5px; }
-        
-        /* CARD CSS - PROFESSIONAL CR80 FORMAT (FLIP SETUP) */
-        .badge-wrapper { display: none; margin-top: 20px; perspective: 1000px; }
-        .flip-card-inner { position: relative; width: 340px; height: 215px; text-align: left; transition: transform 0.6s; transform-style: preserve-3d; margin: auto; }
-        .flip-card-inner.flipped { transform: rotateY(180deg); }
-        .id-card { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); box-sizing: border-box; overflow: hidden; font-family: Arial, sans-serif; }
-        
-        /* COMMON CARD ELEMENTS */
-        .softwire-powered { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 7px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-        
-        /* FRONT FACE (DARK BLUE BLUE LATTICE) */
-        .card-front { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 15px; }
-        .card-front::after { content: ""; position: absolute; top: -50%; right: -20%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 70%); pointer-events: none; }
-        
-        .card-header-flex { display: flex; justify-content: space-between; align-items: start; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 6px; margin-bottom: 10px; }
-        .card-comp-name { font-size: 15px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; color: #00d2ff; }
-        .card-comp-logo { max-height: 25px; width: auto; max-width: 80px; border-radius: 3px; object-fit: contain; }
-        
-        .card-body-flex { display: flex; gap: 12px; }
-        .card-photo-box { width: 75px; height: 85px; background: white; border-radius: 6px; padding: 3px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
-        .card-photo-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
-        
-        .card-main-info { flex: 1; font-size: 10px; line-height: 1.4; color: #e0f2f1; }
-        .card-holder-name { font-size: 14px; font-weight: 800; color: white; margin-bottom: 1px; text-transform: capitalize; }
-        .card-holder-role { font-size: 11px; font-weight: 700; color: #ffbc00; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .info-row { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
-        .info-label { font-weight: bold; color: rgba(255,255,255,0.7); width: 30px; }
-        
-        /* Barcode (Attendance) */
-        .card-barcode-area { position: absolute; bottom: 35px; left: 15px; width: 120px; height: 35px; background: white; border-radius: 3px; padding: 2px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .card-barcode-area img { max-width: 100%; height: 100%; object-fit: cover; }
-        
-        .card-valid-area { position: absolute; bottom: 35px; right: 15px; text-align: right; font-size: 7px; color: rgba(255,255,255,0.7); }
-        .card-dates { display: flex; gap: 10px; text-transform: uppercase; }
-        
-        /* BACK FACE (CLEAN, WHITE PROFESSIONAL) */
-        .card-back { background: #ffffff; color: #333; transform: rotateY(180deg); padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #ddd; }
-        .card-back .back-qr-box { width: 120px; height: 120px; background: white; padding: 8px; border-radius: 10px; border: 2px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 15px; }
-        .card-back .back-qr-box img { width: 100%; height: 100%; }
-        .card-back h4 { font-size: 12px; margin: 0 0 5px 0; color: #1e3c72; }
-        .card-back p { font-size: 9px; margin: 0; color: #777; line-height: 1.3; width: 80%; }
-        .card-back .powered { color: #aaa; }
+        /* FRONT FACE DESIGN */
+        .card-front { padding: 12px; background: #ffffff; }
+        .front-top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1e3c72; padding-bottom: 4px; }
+        .front-comp-title { font-size: 14px; font-weight: 800; color: #1e3c72; text-transform: uppercase; }
+        .front-comp-logo { max-height: 22px; max-width: 65px; object-fit: contain; }
+        .front-sub-tag { font-size: 10px; font-weight: 600; color: #666; text-align: center; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .front-main-body { display: flex; gap: 10px; margin-top: 10px; align-items: flex-start; }
+        .front-photo-frame { width: 75px; height: 85px; background: #f5f5f5; border-radius: 6px; overflow: hidden; border: 1.5px solid #1e3c72; }
+        .front-photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .front-info-fields { flex: 1; font-size: 10px; line-height: 1.4; color: #333; }
+        .front-info-fields .holder-name { font-size: 14px; font-weight: 800; color: #1e3c72; text-transform: uppercase; margin-bottom: 1px; }
+        .front-info-fields .holder-role { font-size: 11px; font-weight: 700; color: #ff9800; text-transform: uppercase; margin-bottom: 5px; }
+        .front-qr-box { width: 60px; height: 60px; background: white; border: 1px solid #eee; padding: 2px; border-radius: 4px; }
+        .front-qr-box img { width: 100%; height: 100%; }
+        .front-bottom-row { display: flex; justify-content: space-between; align-items: flex-end; position: absolute; bottom: 8px; left: 12px; right: 12px; font-size: 8px; color: #555; }
+        .front-sig-box { width: 60px; height: 25px; border-bottom: 1px solid #999; text-align: center; display: flex; align-items: center; justify-content: center; }
+        .front-sig-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* Camera / Scanner */
-        #cameraStream { width: 100%; height: 180px; background: #000; border-radius: 10px; margin-bottom: 10px; display: none; }
+        /* BACK FACE DESIGN */
+        .card-back { background: #fafafa; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .back-title { font-size: 12px; font-weight: 800; color: #1e3c72; margin-bottom: 8px; text-transform: uppercase; }
+        .back-qr-box { width: 95px; height: 95px; background: white; padding: 4px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 8px; }
+        .back-qr-box img { width: 100%; height: 100%; }
+        .back-desc { font-size: 8px; color: #555; line-height: 1.3; width: 85%; margin-bottom: 8px; }
+        .back-footer { font-size: 8px; font-weight: bold; color: #1e3c72; text-transform: uppercase; border-top: 1px solid #ddd; width: 100%; padding-top: 4px; }
+
+        #cameraStream { width: 100%; height: 150px; background: #000; border-radius: 8px; margin-bottom: 10px; display: none; }
         #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; margin-top: 15px; }
-        
-        /* Print Styler (Only print the FRONT card face) */
-        @media print {
-            body { background: white; padding: 0; margin: 0; }
-            .container, .header-area, .softwire-powered { display: none !important; }
-            .badge-wrapper { display: block !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; text-align: center; padding: 0; margin: 0; }
-            .flip-card-inner { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) !important; box-shadow: none !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .id-card.card-front { position: relative !important; width: 340px !important; height: 215px !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; border: 0.5px solid #ccc; border-radius: 12px; }
-            .action-btns { display: none !important; }
-        }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <div class="header-area">
-        <h2>SGT SYSTEM MGR</h2>
-    </div>
-    <p id="mainSub" style="color:#666; font-size:13px; margin:-10px 0 15px 0;">Loading Scanner...</p>
+    <h2>SOFTWIRE ID MANAGER</h2>
+    <p id="mainSub" style="color:#666; font-size:13px;">Loading Scanner...</p>
     <div id="reader"></div>
 
     <div class="panel" id="superAdminPanel">
-        <h3 style="color: #1e3c72; margin: 0 0 15px 0;">Super-Admin Panel</h3>
+        <h3 style="color: #1e3c72; margin: 0 0 10px 0;">👑 Super-Admin Panel</h3>
         <input type="text" id="compName" placeholder="Company Name (e.g., SE Group)">
-        <input type="text" id="clientCity" placeholder="City (e.g., Karachi)">
-        
+        <input type="text" id="clientName" placeholder="Client Owner Name">
+        <input type="text" id="clientCity" placeholder="City">
         <div class="phone-container">
-            <input type="text" id="phoneCode" class="phone-code" value="+92" placeholder="+XX">
+            <input type="text" id="phoneCode" class="phone-code" value="+92">
             <input type="text" id="clientMobile" class="phone-num" placeholder="3007654321">
         </div>
+        <input type="text" id="clientDesig" placeholder="Designation (e.g. Owner)">
         
-        <label class="upload-label">Upload Company Logo:</label>
-        <input type="file" id="logoUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:15px;">
+        <label style="font-size:12px; font-weight:bold;">Upload Company Logo:</label>
+        <input type="file" id="logoUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:5px;">
         
-        <button class="btn-create" onclick="generateClient()">Create & Sync Client System</button>
-        <div id="superQrOutput" style="margin-top:15px; text-align:center; display:flex; flex-direction:column; align-items:center;"></div>
+        <label style="font-size:12px; font-weight:bold;">Upload Owner Signature:</label>
+        <input type="file" id="sigUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:10px;">
+        
+        <button onclick="generateClient()">Create Client & Generate Card</button>
+        <div id="superQrOutput" style="margin-top:15px; text-align:center;"></div>
     </div>
 
     <div class="panel" id="clientAdminPanel">
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-            <img id="clientPanelLogo" src="" style="max-height:35px; width:auto; border-radius:4px; display:none;">
-            <h3 id="adminTitle" style="margin:0; color: #1e3c72; font-size:18px;">Client Dashboard</h3>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <img id="clientPanelLogo" src="" style="max-height:40px; display:none; border-radius:4px;">
+            <h3 id="adminTitle" style="margin:0;">👑 Client Dashboard</h3>
         </div>
         <input type="text" id="staffName" placeholder="Staff Full Name">
         <select id="staffDesig">
             <option value="Machine Operator">Machine Operator</option>
             <option value="Service Engineer">Service Engineer</option>
         </select>
-        
-        <button type="button" onclick="startCamera()" style="background-color:#17a2b8; margin-bottom:10px;">📸 Use Camera</button>
+        <button type="button" onclick="startCamera()" style="background-color:#17a2b8;">📸 Open Staff Camera</button>
         <video id="cameraStream" autoplay playsinline></video>
+        <button type="button" id="snapBtn" onclick="takeSnapshot()" style="background-color:#6f42c1; display:none;">🎯 Capture Photo</button>
         <canvas id="photoCanvas" style="display:none;"></canvas>
         <input type="hidden" id="capturedPhotoData">
-        
-        <button class="btn-create" onclick="createStaffBadge()">Generate Professional Smart Badge</button>
+        <button onclick="createStaffBadge()" style="margin-top:10px;">Generate Staff Smart Badge</button>
     </div>
 
     <div class="badge-wrapper" id="badgeWrapper">
-        <div class="flip-card-inner" id="flipCardInner">
+        <div class="cards-print-container">
             
             <div class="id-card card-front">
-                <div class="card-header-flex">
-                    <div id="cardCompName" class="card-comp-name">SOFTWIRE SE GROUP</div>
-                    <img id="cardHeaderLogo" class="card-comp-logo" src="" alt="L">
+                <div class="front-top-bar">
+                    <div id="cardCompName" class="front-comp-title">COMPANY NAME</div>
+                    <img id="cardHeaderLogo" class="front-comp-logo" src="" alt="Logo">
                 </div>
-                
-                <div class="card-body-flex">
-                    <div class="card-photo-box">
-                        <img id="cardPhotoImg" src="" alt="P">
+                <div class="front-sub-tag">DIGITAL ID CARD</div>
+                <div class="front-main-body">
+                    <div class="front-photo-frame">
+                        <img id="cardPhotoImg" src="" alt="Holder">
                     </div>
-                    <div class="card-main-info">
-                        <div id="cardHolderName" class="card-holder-name">Name</div>
-                        <div id="cardHolderRole" class="card-holder-role">Role</div>
-                        
-                        <div class="info-row"><span class="info-label">City:</span><span id="cardHolderCity">-</span></div>
-                        <div class="info-row"><span class="info-label">Mob:</span><span id="cardHolderMob">-</span></div>
-                        <div class="info-row"><span class="info-label">Status:</span><span style="color:#00e676;font-weight:700;">ACTIVE</span></div>
+                    <div class="front-info-fields">
+                        <div id="cardHolderName" class="holder-name">Azeem Khan</div>
+                        <div id="cardHolderRole" class="holder-role">Manager</div>
+                        <div><strong>City:</strong> <span id="cardHolderCity">-</span></div>
+                        <div><strong>Mob:</strong> <span id="cardHolderMob">-</span></div>
+                    </div>
+                    <div id="frontQrContainer" class="front-qr-box"></div>
+                </div>
+                <div class="front-bottom-row">
+                    <div>
+                        <div>ISSUE: <span id="cardIssueDate">-</span></div>
+                        <div>EXPIRY: <span id="cardExpiryDate">-</span></div>
+                    </div>
+                    <div>
+                        <div class="front-sig-box" id="cardSigContainer"></div>
+                        <div style="font-size:6px; text-align:center; margin-top:1px;">SIGNATURE</div>
                     </div>
                 </div>
-                
-                <div id="cardBarcodeContainer" class="card-barcode-area"></div>
-                
-                <div class="card-valid-area">
-                    <div class="card-dates">
-                        <div>ISSUE: <span id="cardIssueDate">15/06/2026</span></div>
-                        <div>EXPIRY: <span id="cardExpiryDate">15/06/2027</span></div>
-                    </div>
+            </div>
+
+            <div class="id-card card-back">
+                <div class="back-title">System Access Card</div>
+                <div id="backQrContainer" class="back-qr-box"></div>
+                <div class="back-desc">
+                    <strong>USAGE INSTRUCTIONS:</strong><br>
+                    1. Ensure internet/network access is available.<br>
+                    2. Point your mobile camera at this back-scan QR code.<br>
+                    3. System dashboard link will trigger automatically based on authorized permissions.
                 </div>
-                
-                <div class="softwire-powered">POWERED BY SOFTWIRE SGT SYSTEM</div>
+                <div class="back-footer">Powered by Softwire</div>
             </div>
             
-            <div class="id-card card-back">
-                <h4>SGT SYSTEM ACCESS</h4>
-                <div class="back-qr-box">
-                    <div id="cardQrContainer"></div>
-                </div>
-                <p>Scan this QR code with your mobile camera to access your specific operator troubleshoot panel.</p>
-                <div class="softwire-powered powered">POWERED BY SOFTWIRE SGT SYSTEM</div>
-            </div>
         </div>
-        
-        <div class="action-btns" style="margin-top:15px; display:flex; flex-direction:column; gap:5px;">
-            <button class="btn-flip" onclick="flipCard()">🔄 Flip Card (Front/Back)</button>
-            <button class="btn-create" onclick="window.print()">🖨️ Print Badge (CR80)</button>
-            <button id="whatsappShareBtn" class="btn-wapp" onclick="shareOnWhatsApp()" style="display:none;">💬 Send via WhatsApp</button>
-        </div>
+        <button onclick="window.print()" style="background-color:#28a745; margin-top:15px;">🖨️ Download / Print Cards (CR80)</button>
+        <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px; display:none;" onclick="shareOnWhatsApp()">💬 Send Card Info via WhatsApp</button>
     </div>
 </div>
 
 <script>
-let html5QrCode; let localStream; let uploadedLogoBase64 = "";
-let currentClientCompany = "Company"; let currentClientCity = "-"; let currentClientMob = "-"; let globalQrUrl = "";
+let html5QrCode; let localStream; let uploadedLogoBase64 = ""; let uploadedSigBase64 = "";
+let currentClientCompany = ""; let currentClientCity = ""; let currentClientMob = ""; let globalSystemUrl = "";
+const systemUrl = "https://azadbestow-cmd.github.io/sgt-system/qr%20code.html";
 const webAppUrl = "https://script.google.com/macros/s/AKfycbxNa51uPFhMwD9Wi6CWbztmQpG5UyHttWjOmhKf-TkHsCmMSmn8wqr8d3Dq_H5ol2o/exec";
 
-// 1. Convert Uploaded Logo to Base64 (Super-Admin)
 document.getElementById('logoUpload').addEventListener('change', function(e) {
     let file = e.target.files[0]; let reader = new FileReader();
     reader.onloadend = function() { uploadedLogoBase64 = reader.result; }
-    if (file) { reader.readAsDataURL(file); }
+    if (file) reader.readAsDataURL(file);
 });
 
-// 2. Load Scanner
+document.getElementById('sigUpload').addEventListener('change', function(e) {
+    let file = e.target.files[0]; let reader = new FileReader();
+    reader.onloadend = function() { uploadedSigBase64 = reader.result; }
+    if (file) reader.readAsDataURL(file);
+});
+
 window.addEventListener('DOMContentLoaded', () => {
     html5QrCode = new Html5Qrcode("reader");
     Html5Qrcode.getCameras().then(cameras => {
         if (cameras && cameras.length > 0) {
             html5QrCode.start(cameras[cameras.length-1].id, { fps: 10, qrbox: 250 }, onScanSuccess, () => {});
         }
-    }).catch(() => { document.getElementById("mainSub").innerText = "Camera Required / Permission Needed."; });
+    }).catch(() => { document.getElementById("mainSub").innerText = "Camera Permission Required."; });
 });
 
-// 3. Scan Handling (Roles)
 function onScanSuccess(decodedText) {
     html5QrCode.stop(); document.getElementById("reader").style.display = "none";
-    
     if(decodedText.includes("AZEEM-SUPER")) {
         document.getElementById("superAdminPanel").style.display = "block";
     } else if(decodedText.includes("CLIENT-LOG-")) {
         let data = JSON.parse(decodedText.replace("CLIENT-LOG-", ""));
-        currentClientCompany = data.comp; currentClientCity = data.city || "-"; currentClientMob = data.mob || "-";
-        
+        currentClientCompany = data.comp; currentClientCity = data.city; currentClientMob = data.mob;
         document.getElementById("clientAdminPanel").style.display = "block";
-        document.getElementById("adminTitle").innerText = data.comp + " Admin";
-        
+        document.getElementById("adminTitle").innerText = data.comp + " Dashboard";
         if(data.logo && data.logo !== "NO") { 
-            uploadedLogoBase64 = data.logo; 
             let img = document.getElementById("clientPanelLogo"); img.src = data.logo; img.style.display = "block"; 
         }
     }
 }
 
-function getGPSLocation(callback) { navigator.geolocation.getCurrentPosition((pos) => callback(`${pos.coords.latitude},${pos.coords.longitude}`), () => callback("Permission Denied")); }
+function getGPSLocation(callback) {
+    navigator.geolocation.getCurrentPosition((pos) => callback(`${pos.coords.latitude},${pos.coords.longitude}`), () => callback("Permission Denied"));
+}
 
-// 4. GENERATE CLIENT SYSTEM (CR80 SUPER ADMIN CARD + BACK QR ACCESS)
 function generateClient() {
-    let comp = document.getElementById("compName").value; let city = document.getElementById("clientCity").value; 
-    let fullMobile = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
-    
-    if(!comp || !fullMobile) { alert("Company Name & Mobile are required."); return; }
+    let comp = document.getElementById("compName").value; let name = document.getElementById("clientName").value;
+    let city = document.getElementById("clientCity").value; let fullMobile = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
+    let desig = document.getElementById("clientDesig").value || "Owner";
+    if(!comp || !name) { alert("Fill required fields!"); return; }
     
     getGPSLocation((geo) => {
-        // Dynamic QR String (encoded, smaller footprint)
-        let qrStr = "CLIENT-LOG-" + JSON.stringify({ comp: comp, city: city, mob: fullMobile, logo: (uploadedLogoBase64 ? "YES" : "NO") });
-        globalQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrStr)}`;
+        // Front QR String (Scans for dynamic action when app is running)
+        let frontToken = `FRONT-VERIFY-${comp}-${Math.floor(1000+Math.random()*9000)}`;
+        let frontQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(frontToken)}`;
         
-        // Populate professional CR80 FRONT face
-        document.getElementById("cardCompName").innerText = "SOFTWIRE " + comp.toUpperCase();
-        document.getElementById("cardHeaderLogo").src = uploadedLogoBase64 || "https://via.placeholder.com/80x30?text=LOGO";
-        document.getElementById("cardHolderName").innerText = comp; document.getElementById("cardHolderRole").innerText = "Owner/MGR";
+        // Back QR String (Opens GitHub Deployment Link)
+        let backQrString = "CLIENT-LOG-" + JSON.stringify({ comp: comp, city: city, mob: fullMobile, logo: (uploadedLogoBase64 ? "YES" : "NO") });
+        let backQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(backQrString)}`;
+        globalSystemUrl = backQrUrl;
+
+        // Render Cards Info
+        document.getElementById("cardCompName").innerText = comp.toUpperCase();
+        document.getElementById("cardHeaderLogo").src = uploadedLogoBase64 || "https://via.placeholder.com/65x22?text=LOGO";
+        document.getElementById("cardHolderName").innerText = name; document.getElementById("cardHolderRole").innerText = desig;
         document.getElementById("cardHolderCity").innerText = city; document.getElementById("cardHolderMob").innerText = fullMobile;
-        document.getElementById("cardPhotoImg").src = uploadedLogoBase64 || "https://via.placeholder.com/75x85?text=Logo";
+        document.getElementById("cardPhotoImg").src = uploadedLogoBase64 || "https://via.placeholder.com/75x85?text=Owner+Photo";
         
-        // Attendance Barcode (FRONT)
-        let barcodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x50&data=${encodeURIComponent('ATTEND-'+fullMobile)}`; // Simulating Barcode as an image QR (small height)
-        document.getElementById("cardBarcodeContainer").innerHTML = `<img src="${barcodeUrl}" alt="A">`;
-        
-        // Back QR (SYSTEM ACCESS)
-        document.getElementById("cardQrContainer").innerHTML = `<img src="${globalQrUrl}">`;
+        document.getElementById("frontQrContainer").innerHTML = `<img src="${frontQrUrl}">`;
+        document.getElementById("backQrContainer").innerHTML = `<img src="${backQrUrl}">`;
+        if(uploadedSigBase64) { document.getElementById("cardSigContainer").innerHTML = `<img src="${uploadedSigBase64}">`; }
         
         let t = new Date();
         document.getElementById("cardIssueDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + t.getFullYear();
         document.getElementById("cardExpiryDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + (t.getFullYear()+1);
         
-        document.getElementById("superQrOutput").innerHTML = `<h4>${comp} System QR</h4><img src="${globalQrUrl}">`;
+        document.getElementById("whatsappShareBtn").style.display = "block";
         document.getElementById("badgeWrapper").style.display = "block";
         
-        // Sync to sheet
-        let clientData = { comp: comp, name: comp, city: city, mob: fullMobile, desig: "Owner", logo: uploadedLogoBase64, qr: globalQrUrl, geo: geo, type: "NEW_CLIENT" };
+        let clientData = { comp: comp, name: name, city: city, mob: fullMobile, desig: desig, logo: uploadedLogoBase64, sig: uploadedSigBase64, qr: backQrUrl, geo: geo, type: "NEW_CLIENT" };
         fetch(webAppUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(clientData) });
     });
 }
 
-// 5. GENERATE STAFF BADGE (FRONT PHOTO BACK QR)
+function startCamera() {
+    document.getElementById("cameraStream").style.display = "block"; document.getElementById("snapBtn").style.display = "block";
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => { localStream = stream; document.getElementById("cameraStream").srcObject = stream; });
+}
+
+function takeSnapshot() {
+    let video = document.getElementById("cameraStream"); let canvas = document.getElementById("photoCanvas");
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0);
+    let dataUrl = canvas.toDataURL('image/jpeg');
+    document.getElementById("capturedPhotoData").value = dataUrl; document.getElementById("cardPhotoImg").src = dataUrl;
+    localStream.getTracks().forEach(track => track.stop()); video.style.display = "none"; document.getElementById("snapBtn").style.display = "none";
+}
+
 function createStaffBadge() {
     let name = document.getElementById("staffName").value; let desig = document.getElementById("staffDesig").value; let photo = document.getElementById("capturedPhotoData").value;
-    if(!name || !photo) { alert("Name and Photo capture required."); return; }
+    if(!name || !photo) { alert("Enter name and capture photo"); return; }
+    let t = new Date(); let issue = t.getDate() + '/' + (t.getMonth()+1) + '/' + t.getFullYear(); let expiry = t.getDate() + '/' + (t.getMonth()+1) + '/' + (t.getFullYear()+1);
     
-    // Front populate
-    document.getElementById("cardCompName").innerText = "SOFTWIRE " + currentClientCompany.toUpperCase();
-    document.getElementById("cardHeaderLogo").src = uploadedLogoBase64 || "https://via.placeholder.com/80x30?text=LOGO";
+    document.getElementById("cardCompName").innerText = currentClientCompany.toUpperCase();
     document.getElementById("cardHolderName").innerText = name; document.getElementById("cardHolderRole").innerText = desig;
     document.getElementById("cardHolderCity").innerText = currentClientCity; document.getElementById("cardHolderMob").innerText = currentClientMob;
     document.getElementById("cardPhotoImg").src = photo;
     
-    // Attendance Barcode (FRONT)
-    let randId = Math.floor(1000+Math.random()*9000);
-    let barcodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x50&data=${encodeURIComponent('ATTEND-'+name+'-'+randId)}`; 
-    document.getElementById("cardBarcodeContainer").innerHTML = `<img src="${barcodeUrl}" alt="A">`;
-    
-    // Back QR (STAFF ACCESS PANEL)
-    let staffToken = `STAFF-${desig}-${name}-${randId}`;
-    let staffQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(staffToken)}`;
-    document.getElementById("cardQrContainer").innerHTML = `<img src="${staffQrUrl}">`;
-    
-    let t = new Date();
-    document.getElementById("cardIssueDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + t.getFullYear();
-    document.getElementById("cardExpiryDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + (t.getFullYear()+1);
+    let staffFrontToken = `STAFF-FRONT-${name}-${Math.floor(1000+Math.random()*9000)}`;
+    let staffFrontQr = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(staffFrontToken)}`;
+    document.getElementById("frontQrContainer").innerHTML = `<img src="${staffFrontQr}">`;
+    document.getElementById("backQrContainer").innerHTML = `<img src="${globalSystemUrl || 'STAFF-BACK-LINK'}">`;
     
     document.getElementById("badgeWrapper").style.display = "block";
-    
-    // Sync to sheet
     getGPSLocation((geo) => {
-        let staffLog = { type: "NEW_STAFF", comp: currentClientCompany, name: name, desig: desig, geo: geo, photo: photo, qr: staffQrUrl };
+        let staffLog = { type: "NEW_STAFF", comp: currentClientCompany, name: name, desig: desig, geo: geo, photo: photo };
         fetch(webAppUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(staffLog) });
     });
 }
 
-// Operational Utils
-function flipCard() { document.getElementById("flipCardInner").classList.toggle("flipped"); }
-function startCamera() { document.getElementById("cameraStream").style.display = "block"; navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => { localStream = stream; document.getElementById("cameraStream").srcObject = stream; document.getElementById("cameraStream").onplay = function() { captureCanvas(); }; }); }
-function captureCanvas() { let video = document.getElementById("cameraStream"); let canvas = document.getElementById("photoCanvas"); let photoDataInput = document.getElementById("capturedPhotoData"); let photoPreviewImg = document.getElementById("cardPhotoImg"); canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0); let dataUrl = canvas.toDataURL('image/jpeg'); photoDataInput.value = dataUrl; photoPreviewImg.src = dataUrl; localStream.getTracks().forEach(track => track.stop()); video.style.display = "none"; }
+function shareOnWhatsApp() {
+    let mob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
+    let comp = document.getElementById("compName").value;
+    let msg = `Hello Admin, Your system card for ${comp} has been generated. Scan back QR to open system. Link: ${systemUrl}`;
+    window.open(`https://wa.me/${mob.replace('+', '')}?text=${encodeURIComponent(msg)}`, '_blank');
+}
 </script>
 </body>
 </html>
