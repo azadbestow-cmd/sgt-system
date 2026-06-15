@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGT Auto-Scanner System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f9; padding: 20px; margin: 0; }
+        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0px 4px 15px rgba(0,0,0,0.05); position: relative; }
+        .header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #007bff; }
+        input:checked + .slider:before { transform: translateX(24px); }
+        button { background-color: #007bff; color: white; border: none; padding: 14px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; }
+        .panel { display: none; margin-top: 25px; text-align: left; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa; }
+        .box { margin-top: 15px; padding: 15px; border-radius: 6px; text-align: left; font-size: 15px; }
+        .urdu-mode { direction: rtl; text-align: right; }
+        .urdu-mode .header-area { flex-direction: row-reverse; }
+        #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #000; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="mainContainer">
+    
+    <div class="header-area">
+        <h2 id="mainTitle" style="margin:0; font-size: 22px;">SGT SYSTEM</h2>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span>EN</span>
+            <label class="switch">
+                <input type="checkbox" id="langToggle" onchange="toggleLanguage()">
+                <span class="slider"></span>
+            </label>
+            <span>اردو</span>
+        </div>
+    </div>
+    
+    <p id="mainSub" style="color:#666; font-size:14px; margin-top:-10px;">Camera Loading Automatically...</p>
+    
+    <div id="reader"></div>
+
+    <div class="panel" id="superAdminPanel">
+        <h3 style="color: #007bff;">👑 Azeem Khan (Super-Admin)</h3>
+        <p><strong>Status:</strong> Connected</p>
+        <hr>
+        <input type="text" id="clientName" placeholder="Client Company Name" style="width:95%; padding:11px; margin-bottom:12px; border:1px solid #ccc; border-radius:4px;">
+        <button onclick="generateClientQR()" style="background-color: #28a745;">Generate Client Admin QR</button>
+        <div id="superQrOutput" style="margin-top:20px; text-align:center;"></div>
+    </div>
+
+    <div class="panel" id="clientAdminPanel">
+        <h3 id="adminTitle">👑 Client Admin Dashboard</h3>
+        <input type="text" id="newUserName" placeholder="User Name" style="width:95%; padding:11px; margin-bottom:12px; border:1px solid #ccc; border-radius:4px;">
+        <select id="userDesignation" style="width:100%; padding:11px; margin-bottom:12px; border:1px solid #ccc; border-radius:4px;">
+            <option value="Operator" id="optOperator">Machine Operator</option>
+            <option value="Engineer" id="optEngineer">Service Engineer</option>
+        </select>
+        <button id="genQrBtn" onclick="generateSubUserQR()" style="background-color: #28a745;">Generate Unique QR Code</button>
+        <div id="qrOutput" style="margin-top:20px; text-align:center;"></div>
+    </div>
+
+    <div class="panel" id="operatorPanel">
+        <h3 id="optTitle">⚙️ Machine Operator Panel</h3>
+        <div class="box" id="probBox" style="background-color: #ffebee; color: #c62828; border-left: 5px solid #c62828;"></div>
+        <div class="box" id="solBox" style="background-color: #e8f5e9; color: #2e7d32; border-left: 5px solid #2e7d32;"></div>
+        <button id="doneBtn" style="background-color: #2e7d32;" onclick="sendFixToSheet()">MARK AS FIXED / DONE</button>
+    </div>
+</div>
+
+<script>
+let currentLanguage = 'en';
+let html5QrCode;
+let globalDecodedText = ""; 
+const webAppUrl = "https://script.google.com/macros/s/AKfycbyOfdLblRpwI04yiq2RfzwyVuGDxYmHhAH0eHur69s4cbEgibUgI-SPhNi_yN-wEZGU/exec";
+
+const textBank = {
+    en: { title: "SGT SYSTEM", sub: "Scan QR Code to Log In", admTitle: "👑 Client Admin Dashboard", placeholder: "User Name", optOp: "Machine Operator", optEng: "Service Engineer", genBtn: "Generate Unique QR Code", optTitle: "⚙️ Machine Operator Panel", doneBtn: "MARK AS FIXED / DONE", prob: "<strong>🛑 PROBLEM:</strong> Continuous Inkjet (CIJ) - Filter Blocked.", sol: "<strong>🟢 SOLUTION:</strong> 1. Clean nozzle. 2. Restart cleaning pump." },
+    ur: { title: "ایس جی ٹی سسٹم", sub: "لاگ ان کرنے کے لیے کیو آر کوڈ اسکین کریں", admTitle: "👑 کلائنٹ ایڈمن ڈیش بورڈ", placeholder: "صارف کا نام", optOp: "مشین آپریٹر", optEng: "سروس انجینئر", genBtn: "کیو آر کوڈ بنائیں", optTitle: "⚙️ مشین آپریٹر پینل", doneBtn: "مسئلہ حل ہو گیا / مکمل", prob: "<strong>🛑 مسئلہ:</strong> انک جیٹ مشین کا فلٹر بلاک ہو گیا ہے۔", sol: "<strong>🟢 حل:</strong> ۱۔ نوزل صاف کریں۔ ۲۔ کلیننگ پمپ دوبارہ چلائیں۔" }
+};
+
+// AUTOMATICALLY START CAMERA ON PAGE LOAD
+window.addEventListener('DOMContentLoaded', () => {
+    html5QrCode = new Html5Qrcode("reader");
+    Html5Qrcode.getCameras().then(cameras => {
+        if (cameras && cameras.length > 0) {
+            // Mobile ka back camera select karne ki koshish
+            let cameraId = cameras[0].id;
+            if(cameras.length > 1) { cameraId = cameras[1].id; } 
+            
+            html5QrCode.start(
+                cameraId, 
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                onScanSuccess,
+                onScanFailure
+            ).then(() => {
+                document.getElementById("mainSub").innerText = textBank[currentLanguage].sub;
+            });
+        }
+    }).catch(err => {
+        document.getElementById("mainSub").innerText = "Camera Permission Required! / کیمرے کی اجازت لازمی ہے۔";
+    });
+});
+
+function onScanSuccess(decodedText, decodedResult) {
+    html5QrCode.stop();
+    document.getElementById("reader").style.display = "none";
+    globalDecodedText = decodedText;
+    
+    if(decodedText.includes("AZEEM-SUPER")) {
+        document.getElementById("superAdminPanel").style.display = "block";
+    } else if(decodedText.includes("ADMIN")) {
+        document.getElementById("clientAdminPanel").style.display = "block";
+    } else if(decodedText.includes("Operator")) {
+        document.getElementById("operatorPanel").style.display = "block";
+        showOperatorTask();
+    } else {
+        alert("Unknown QR Code / غیر معروف کیو آر کوڈ");
+    }
+}
+
+function onScanFailure(error) {
+    // Piche chupke se scan dhoondta rahega, error show nahi karega
+}
+
+function toggleLanguage() {
+    const isUrdu = document.getElementById("langToggle").checked;
+    currentLanguage = isUrdu ? 'ur' : 'en';
+    const container = document.getElementById("mainContainer");
+    if(isUrdu) { container.classList.add("urdu-mode"); } else { container.classList.remove("urdu-mode"); }
+    document.getElementById("mainTitle").innerText = textBank[currentLanguage].title;
+    document.getElementById("mainSub").innerText = textBank[currentLanguage].sub;
+    document.getElementById("adminTitle").innerText = textBank[currentLanguage].admTitle;
+    document.getElementById("newUserName").placeholder = textBank[currentLanguage].placeholder;
+    document.getElementById("optOperator").innerText = textBank[currentLanguage].optOp;
+    document.getElementById("optEngineer").innerText = textBank[currentLanguage].optEng;
+    document.getElementById("genQrBtn").innerText = textBank[currentLanguage].genBtn;
+    document.getElementById("optTitle").innerText = textBank[currentLanguage].optTitle;
+    document.getElementById("doneBtn").innerText = textBank[currentLanguage].doneBtn;
+}
+
+function generateClientQR() {
+    let cName = document.getElementById("clientName").value;
+    if(!cName) { alert("Enter Client Name"); return; }
+    let uniqueString = "SGT-ADMIN-" + cName.replace(/\s+/g, '-');
+    let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${uniqueString}`;
+    document.getElementById("superQrOutput").innerHTML = `<h4>QR for ${cName}</h4><img src="${qrUrl}">`;
+}
+
+function generateSubUserQR() {
+    let name = document.getElementById("newUserName").value;
+    let desig = document.getElementById("userDesignation").value;
+    if(!name) { alert(currentLanguage === 'en' ? "Please enter name" : "برائے مہربانی نام لکھیں"); return; }
+    let uniqueString = "SGT-" + desig + "-" + name.replace(/\s+/g, '-');
+    let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${uniqueString}`;
+    document.getElementById("qrOutput").innerHTML = `<p><strong>QR for ${name}</strong></p><img src="${qrUrl}">`;
+}
+
+function showOperatorTask() {
+    document.getElementById("probBox").innerHTML = textBank[currentLanguage].prob;
+    document.getElementById("solBox").innerHTML = textBank[currentLanguage].sol;
+}
+
+function sendFixToSheet() {
+    const payload = { staffId: "Operator-Scanned", status: "CIJ Filter Blocked - FIXED" };
+    fetch(webAppUrl, { method: "POST", mode: "no-cors", cache: "no-cache", body: JSON.stringify(payload) })
+    .then(() => { alert(currentLanguage === 'en' ? "Saved!" : "محفوظ ہو گیا!"); location.reload(); });
+}
+</script>
+</body>
+</html>
