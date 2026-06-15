@@ -8,8 +8,10 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f9; padding: 15px; margin: 0; }
         .container { max-width: 450px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0px 4px 15px rgba(0,0,0,0.05); }
-        .header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         input, select { width: 94%; padding: 11px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .phone-container { display: flex; gap: 5px; width: 98%; margin-bottom: 10px; }
+        .phone-code { width: 25%; padding: 11px; border: 1px solid #ccc; border-radius: 6px; background: #eee; font-weight: bold; text-align: center; }
+        .phone-num { width: 75%; padding: 11px; border: 1px solid #ccc; border-radius: 6px; }
         button { background-color: #28a745; color: white; border: none; padding: 12px; font-size: 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
         .panel { display: none; margin-top: 20px; text-align: left; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa; }
         .badge-wrapper { display: none; margin-top: 20px; }
@@ -39,11 +41,16 @@
         <input type="text" id="compName" placeholder="Company Name (e.g., Softwire)">
         <input type="text" id="clientName" placeholder="Client Owner Name">
         <input type="text" id="clientCity" placeholder="City">
-        <input type="text" id="clientMobile" placeholder="Mobile Number">
-        <input type="text" id="clientDesig" placeholder="Designation">
+        
+        <div class="phone-container">
+            <input type="text" id="phoneCode" class="phone-code" value="+92">
+            <input type="text" id="clientMobile" class="phone-num" placeholder="3007654321">
+        </div>
+        
+        <input type="text" id="clientDesig" placeholder="Designation (e.g. Owner/Director)">
         <label style="font-size:12px; font-weight:bold;">Upload Company Logo:</label>
         <input type="file" id="logoUpload" accept="image/*" style="border:none; padding:5px;">
-        <button onclick="generateClient()">Create Client & Sync Sheet</button>
+        <button onclick="generateClient()">Create Client Card & Sync</button>
         <div id="superQrOutput" style="margin-top:15px; text-align:center;"></div>
     </div>
 
@@ -74,9 +81,9 @@
                     <div class="role" id="cardHolderRole">Role</div>
                     <div><strong>City:</strong> <span id="cardHolderCity">-</span></div>
                     <div><strong>Mob:</strong> <span id="cardHolderMob">-</span></div>
-                    <div><strong>Status:</strong> Verified</div>
+                    <div><strong>Status:</strong> Active</div>
                 </div>
-                <div class="card-photo"><img id="cardPhotoImg" src="" alt="Staff Photo"></div>
+                <div class="card-photo"><img id="cardPhotoImg" src="" alt="Photo"></div>
                 <div class="card-qr" id="cardQrContainer"></div>
             </div>
             <div class="card-footer">
@@ -84,14 +91,14 @@
                 <div>EXPIRY: <span id="cardExpiryDate">-</span></div>
             </div>
         </div>
-        <button onclick="window.print()" style="background-color:#28a745; margin-top:10px;">🖨️ Print / Save PDF</button>
+        <button onclick="window.print()" style="background-color:#28a745; margin-top:10px;">🖨️ Download / Print Card</button>
+        <button id="whatsappShareBtn" onclick="shareOnWhatsApp()" style="background-color:#25D366; margin-top:5px; display:none;">💬 Send via WhatsApp</button>
     </div>
 </div>
 
 <script>
 let html5QrCode; let localStream; let uploadedLogoBase64 = "";
-let currentClientCompany = "Company"; let currentClientCity = "-"; let currentClientMob = "-";
-const webAppUrl = "https://script.google.com/macros/s/AKfycbyOfdLblRpwI04yiq2RfzwyVuGDxYmHhAH0eHur69s4cbEgibUgI-SPhNi_yN-wEZGU/exec";
+let currentClientCompany = "Company"; let currentClientCity = "-"; let currentClientMob = "-"; let globalQrUrl = "";
 
 document.getElementById('logoUpload').addEventListener('change', function(e) {
     let file = e.target.files[0]; let reader = new FileReader();
@@ -117,7 +124,7 @@ function onScanSuccess(decodedText) {
         currentClientCompany = data.comp; currentClientCity = data.city || "-"; currentClientMob = data.mob || "-";
         document.getElementById("clientAdminPanel").style.display = "block";
         document.getElementById("adminTitle").innerText = data.comp + " Admin";
-        if(data.logo) { let img = document.getElementById("clientPanelLogo"); img.src = data.logo; img.style.display = "block"; }
+        if(data.logo && data.logo !== "NO") { let img = document.getElementById("clientPanelLogo"); img.src = data.logo; img.style.display = "block"; }
     }
 }
 
@@ -127,16 +134,42 @@ function getGPSLocation(callback) {
 
 function generateClient() {
     let comp = document.getElementById("compName").value; let name = document.getElementById("clientName").value;
-    let city = document.getElementById("clientCity").value; let mob = document.getElementById("clientMobile").value;
-    let desig = document.getElementById("clientDesig").value;
+    let city = document.getElementById("clientCity").value; 
+    let fullMobile = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
+    let desig = document.getElementById("clientDesig").value || "Owner";
+    
     if(!comp || !name) { alert("Fill all fields"); return; }
+    
     getGPSLocation((geo) => {
-        let clientData = { comp: comp, name: name, city: city, mob: mob, desig: desig, logo: uploadedLogoBase64, geo: geo, type: "NEW_CLIENT" };
-        let qrStr = "CLIENT-LOG-" + JSON.stringify({ comp: comp, city: city, mob: mob, logo: (uploadedLogoBase64 ? "YES" : "NO") });
-        let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrStr)}`;
-        document.getElementById("superQrOutput").innerHTML = `<h4>${comp} QR Code</h4><img src="${qrUrl}">`;
+        let qrStr = "CLIENT-LOG-" + JSON.stringify({ comp: comp, city: city, mob: fullMobile, logo: (uploadedLogoBase64 ? "YES" : "NO") });
+        globalQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrStr)}`;
+        
+        let clientData = { comp: comp, name: name, city: city, mob: fullMobile, desig: desig, logo: uploadedLogoBase64, qr: globalQrUrl, geo: geo, type: "NEW_CLIENT" };
+        
+        // Show Client Card Output Instantly
+        document.getElementById("cardCompName").innerText = comp.toUpperCase() + " SYSTEM";
+        document.getElementById("cardHolderName").innerText = name; document.getElementById("cardHolderRole").innerText = desig;
+        document.getElementById("cardHolderCity").innerText = city; document.getElementById("cardHolderMob").innerText = fullMobile;
+        document.getElementById("cardPhotoImg").src = uploadedLogoBase64 || "https://via.placeholder.com/75x85?text=Logo";
+        document.getElementById("cardQrContainer").innerHTML = `<img src="${globalQrUrl}">`;
+        
+        let t = new Date();
+        document.getElementById("cardIssueDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + t.getFullYear();
+        document.getElementById("cardExpiryDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + (t.getFullYear()+1);
+        
+        document.getElementById("whatsappShareBtn").style.display = "block";
+        document.getElementById("badgeWrapper").style.display = "block";
+        
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbxNa51uPFhMwD9Wi6CWbztmQpG5UyHttWjOmhKf-TkHsCmMSmn8wqr8d3Dq_H5ol2o/exec";
         fetch(webAppUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(clientData) });
     });
+}
+
+function shareOnWhatsApp() {
+    let mob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
+    let comp = document.getElementById("compName").value;
+    let msg = `Hello Admin, Your system card for ${comp} has been generated. Scan QR to open system. Link: ${globalQrUrl}`;
+    window.open(`https://wa.me/${mob.replace('+', '')}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
 function startCamera() {
@@ -159,12 +192,12 @@ function createStaffBadge() {
     document.getElementById("cardCompName").innerText = currentClientCompany.toUpperCase() + " SYSTEM";
     document.getElementById("cardHolderName").innerText = name; document.getElementById("cardHolderRole").innerText = desig;
     document.getElementById("cardHolderCity").innerText = currentClientCity; document.getElementById("cardHolderMob").innerText = currentClientMob;
-    document.getElementById("cardIssueDate").innerText = issue; document.getElementById("cardExpiryDate").innerText = expiry;
-    let staffToken = `STAFF-${desig}-${name}-${Math.floor(1000+Math.random()*9000)}`;
-    document.getElementById("cardQrContainer").innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${staffToken}">`;
+    document.getElementById("cardQrContainer").innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent('STAFF-'+name)}">`;
     document.getElementById("badgeWrapper").style.display = "block";
+    
     getGPSLocation((geo) => {
         let staffLog = { type: "NEW_STAFF", comp: currentClientCompany, name: name, desig: desig, geo: geo, photo: photo };
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbxNa51uPFhMwD9Wi6CWbztmQpG5UyHttWjOmhKf-TkHsCmMSmn8wqr8d3Dq_H5ol2o/exec";
         fetch(webAppUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(staffLog) });
     });
 }
