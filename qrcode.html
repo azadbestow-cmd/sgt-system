@@ -21,11 +21,39 @@
         .upload-section { background: #ffffff; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #e3e8ee; }
         .upload-section label { font-size: 12px; font-weight: 700; color: #495057; display: block; margin-bottom: 6px; }
         
-        /* 🪪 PREMIUM CARD DESIGN */
+        /* 🖨️ STRICT FIXED A4 SHEET CONTAINER FOR GALLERY & PDF PRINT */
         .badge-wrapper { display: none; margin-top: 25px; }
-        .a4-export-sheet { background-color: #ffffff; width: 595px; height: 842px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; box-sizing: border-box; padding: 40px; margin: auto; border: 1px dashed #bbb; }
         
-        .id-card { width: 3.375in !important; height: 2.125in !important; background: #ffffff !important; border-radius: 0.125in; box-sizing: border-box; position: relative; overflow: hidden; border: 1.5px solid #999999; text-align: left; display: block !important; }
+        .a4-container-frame { 
+            width: 794px !important; 
+            height: 1123px !important; 
+            background: #ffffff !important; 
+            margin: 20px auto; 
+            padding: 50px; 
+            box-sizing: border-box; 
+            border: 2px solid #ccc; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; 
+            gap: 50px; 
+            position: relative;
+        }
+
+        /* HARD HARDWARE LOCK DIMENSIONS FOR STANDARD CR80 PVC CARD (85.6mm x 54mm) */
+        .id-card { 
+            width: 324px !important; 
+            height: 204px !important; 
+            background: #ffffff !important; 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            position: relative; 
+            overflow: hidden; 
+            border: 1.5px solid #222222; 
+            text-align: left; 
+            box-shadow: none !important;
+        }
+        
         .card-front { padding: 12px 12px 12px 22px; }
         .card-front::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: linear-gradient(to bottom, #1e3c72, #2a5298); }
         
@@ -58,16 +86,20 @@
         .video-box { width: 100%; height: 160px; background: #000; border-radius: 10px; margin-top: 8px; margin-bottom: 5px; display: none; object-fit: cover; border: 2px solid #ced4da; }
         #reader { width: 100%; border-radius: 16px; overflow: hidden; background: #000; margin-top: 15px; }
 
-        @media screen and (max-width: 640px) {
-            .a4-export-sheet { width: 100% !important; height: auto !important; padding: 15px 5px !important; gap: 15px !important; background: #fff !important; border: none !important; }
+        /* Mobile screen visibility fallback wrapper */
+        @media screen and (max-width: 840px) {
+            .scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
+            .a4-container-frame { margin: 10px 0; transform-origin: top left; }
         }
 
+        /* 🖨️ PERFECT NATIVE PRINT MEDIA OVERRIDE FOR MOBILE PDF ENGINES */
         @media print {
-            html, body { background: #ffffff !important; margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .container, .panel, h2, #reader, #mainSub, button, .upload-section, .phone-container { display: none !important; visibility: hidden !important; }
-            .badge-wrapper { display: block !important; position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; }
-            .a4-export-sheet { display: flex !important; width: 595px !important; height: 842px !important; position: absolute !important; left: 0 !important; top: 0 !important; border: none !important; background: #fff !important; margin: 0 !important; }
-            .id-card { display: block !important; box-shadow: none !important; border: 1px solid #777 !important; }
+            @page { size: A4; margin: 0; }
+            body, html { background: #ffffff !important; margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .container, .panel, h2, #reader, #mainSub, button, .upload-section, .phone-container, .scroll-wrapper-buttons { display: none !important; visibility: hidden !important; }
+            .badge-wrapper { display: block !important; position: absolute !important; left: 0 !important; top: 0 !important; width: 794px !important; height: 1123px !important; }
+            .a4-container-frame { display: flex !important; width: 794px !important; height: 1123px !important; position: absolute !important; left: 0 !important; top: 0 !important; border: none !important; margin: 0 !important; padding: 50px !important; box-sizing: border-box !important; page-break-inside: avoid !important; }
+            .id-card { display: block !important; border: 1.5px solid #222 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
     </style>
 </head>
@@ -155,54 +187,67 @@
     </div>
 
     <div class="badge-wrapper" id="badgeWrapper">
-        <div class="a4-export-sheet" id="printableCardsArea">
-            <div class="id-card card-front">
-                <div class="front-top-bar">
-                    <div>
-                        <div id="cardCompName" class="front-comp-title">COMPANY NAME</div>
-                        <div id="cardCompSlogan" class="front-comp-slogan">COMPANY SLOGAN</div>
-                    </div>
-                    <img id="cardHeaderLogo" class="front-comp-logo" src="" alt="Logo">
+        <div class="scroll-wrapper">
+            <div class="a4-container-frame" id="printableCardsArea">
+                
+                <div style="font-size: 14px; font-weight: bold; color: #1e3c72; border-bottom: 2px dashed #1e3c72; width: 100%; padding-bottom: 5px; text-align: left; margin-bottom: -20px;">
+                    SOFTWIRE PRINT SYSTEM — STANDARD A4 LAYOUT SHEET
                 </div>
-                <div class="front-sub-tag">DIGITAL ID CARD</div>
-                <div class="front-main-body">
-                    <div class="front-photo-frame"><img id="cardPhotoImg" src="" alt="Holder"></div>
-                    <div class="front-info-fields">
-                        <div id="cardHolderName" class="holder-name">Azeem Khan</div>
-                        <div id="cardHolderRole" class="holder-role">Manager</div>
-                        <div class="info-row"><strong>City:</strong> <span id="cardHolderCity">-</span></div>
-                        <div class="info-row"><strong>Mob:</strong> <span id="cardHolderMob">-</span></div>
-                    </div>
-                    <div id="frontQrContainer" class="front-qr-box"></div>
-                </div>
-                <div class="front-bottom-row">
-                    <div>
-                        <div>ISSUE: <span id="cardIssueDate">-</span></div>
-                        <div>EXPIRY: <span id="cardExpiryDate">-</span></div>
-                    </div>
-                    <div>
-                        <div class="front-sig-box" id="cardSigContainer"></div>
-                        <div style="font-size:6px; text-align:center; margin-top:2px; font-weight: bold; color: #1e3c72;">SIGNATURE</div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="id-card card-back">
-                <div class="back-title">System Access Card</div>
-                <div id="backQrContainer" class="back-qr-box"></div>
-                <div class="back-desc">
-                    <strong>USAGE INSTRUCTIONS:</strong><br>
-                    1. Ensure mobile internet/network access is available.<br>
-                    2. Point your mobile camera at this back-scan QR code.<br>
-                    3. System dashboard link will trigger automatically.
+                <div class="id-card card-front">
+                    <div class="front-top-bar">
+                        <div>
+                            <div id="cardCompName" class="front-comp-title">COMPANY NAME</div>
+                            <div id="cardCompSlogan" class="front-comp-slogan">COMPANY SLOGAN</div>
+                        </div>
+                        <img id="cardHeaderLogo" class="front-comp-logo" src="" alt="Logo">
+                    </div>
+                    <div class="front-sub-tag">DIGITAL ID CARD</div>
+                    <div class="front-main-body">
+                        <div class="front-photo-frame"><img id="cardPhotoImg" src="" alt="Holder"></div>
+                        <div class="front-info-fields">
+                            <div id="cardHolderName" class="holder-name">Azeem Khan</div>
+                            <div id="cardHolderRole" class="holder-role">Manager</div>
+                            <div class="info-row"><strong>City:</strong> <span id="cardHolderCity">-</span></div>
+                            <div class="info-row"><strong>Mob:</strong> <span id="cardHolderMob">-</span></div>
+                        </div>
+                        <div id="frontQrContainer" class="front-qr-box"></div>
+                    </div>
+                    <div class="front-bottom-row">
+                        <div>
+                            <div>ISSUE: <span id="cardIssueDate">-</span></div>
+                            <div>EXPIRY: <span id="cardExpiryDate">-</span></div>
+                        </div>
+                        <div>
+                            <div class="front-sig-box" id="cardSigContainer"></div>
+                            <div style="font-size:6px; text-align:center; margin-top:2px; font-weight: bold; color: #1e3c72;">SIGNATURE</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="back-footer">Powered by Softwire</div>
+
+                <div class="id-card card-back">
+                    <div class="back-title">System Access Card</div>
+                    <div id="backQrContainer" class="back-qr-box"></div>
+                    <div class="back-desc">
+                        <strong>USAGE INSTRUCTIONS:</strong><br>
+                        1. Ensure mobile internet/network access is available.<br>
+                        2. Point your mobile camera at this back-scan QR code.<br>
+                        3. System dashboard link will trigger automatically.
+                    </div>
+                    <div class="back-footer">Powered by Softwire</div>
+                </div>
+                
+                <div style="position: absolute; bottom: 20px; font-size: 11px; color: #888; text-align: center; width: 100%;">
+                    Confidential — Internal Enterprise Identity Token Document Generated via Mobile Client Sync
+                </div>
             </div>
         </div>
         
-        <button onclick="downloadCardAsImage()" style="background-color:#ff9800; margin-top:20px;">📥 SAVE A4 LAYOUT TO GALLERY</button>
-        <button onclick="window.print()" style="background-color:#28a745; margin-top:5px;">🖨️ SAVE AS PDF / PRINT</button>
-        <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px;" onclick="shareOnWhatsApp()">💬 Send Card via WhatsApp</button>
+        <div class="scroll-wrapper-buttons">
+            <button onclick="downloadCardAsImage()" style="background-color:#ff9800; margin-top:20px;">📥 SAVE A4 SHEET TO GALLERY</button>
+            <button onclick="window.print()" style="background-color:#28a745; margin-top:5px;">🖨️ PRINT SHEET / SAVE AS PDF</button>
+            <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px;" onclick="shareOnWhatsApp()">💬 Send Card via WhatsApp</button>
+        </div>
     </div>
     <canvas id="photoCanvas" style="display:none;"></canvas>
 </div>
@@ -213,7 +258,6 @@ let uploadedLogoBase64 = ""; let uploadedOwnerPhotoBase64 = ""; let uploadedSigB
 let currentClientCompany = ""; let currentClientCity = ""; let currentClientMob = ""; let globalSystemUrl = "";
 let currentClientSlogan = "";
 
-// Stable exact endpoint (No spaces to avoid 404 Errors)
 const systemUrl = "https://azadbestow-cmd.github.io/sgt-system/qrcode.html";
 const webAppUrl = "https://script.google.com/macros/s/AKfycbxNa51uPFhMwD9Wi6CWbztmQpG5UyHttWjOmhKf-TkHsCmMSmn8wqr8d3Dq_H5ol2o/exec";
 
@@ -254,7 +298,6 @@ function stopActiveStream() {
     document.querySelectorAll('.cam-btn').forEach(b => b.style.display = 'block');
 }
 
-// 📸 HIGH RESOLUTION FULL-HD ENGINE SYNCED TO PREVENT BLUR IMAGES
 function openCam(type) {
     stopActiveStream();
     let video = document.getElementById(type + "Video"); 
@@ -276,7 +319,7 @@ function openCam(type) {
 function snapCam(type) {
     let video = document.getElementById(type + "Video"); let canvas = document.getElementById("photoCanvas");
     canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0);
-    let dataUrl = canvas.toDataURL('image/jpeg', 1.0); // 1.0 enforces full high quality crisp outputs
+    let dataUrl = canvas.toDataURL('image/jpeg', 1.0);
     if(type === 'owner') uploadedOwnerPhotoBase64 = dataUrl;
     if(type === 'sig') uploadedSigBase64 = dataUrl;
     if(type === 'staff') document.getElementById("staffCapturedData").value = dataUrl;
@@ -289,7 +332,7 @@ function generateClient() {
     let comp = document.getElementById("compName").value; let name = document.getElementById("clientName").value;
     let city = document.getElementById("clientCity").value; 
     let rawMob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
-    let fullMobile = rawMob.replace(/[^0-9]/g, ""); // Automatic dynamic link regex sanitizer
+    let fullMobile = rawMob.replace(/[^0-9]/g, "");
     let desig = document.getElementById("clientDesig").value || "CEO"; let slogan = document.getElementById("compSlogan").value || "";
     if(!comp || !name) { alert("Fill fields!"); return; }
     
@@ -346,13 +389,19 @@ function createStaffBadge() {
     });
 }
 
+// 📥 HIGH QUALITY A4 IMAGE CAPTURE CONTEXT RENDERER
 function downloadCardAsImage() {
     let target = document.getElementById("printableCardsArea");
-    let origW = target.style.width; let origH = target.style.height; let origBg = target.style.backgroundColor;
-    target.style.width = "595px"; target.style.height = "842px"; target.style.backgroundColor = "#ffffff";
-    
-    html2canvas(target, { scale: 3, useCORS: true, logging: false, scrollX: 0, scrollY: 0 }).then(canvas => {
-        target.style.width = origW; target.style.height = origH; target.style.backgroundColor = origBg;
+    // Force absolute A4 dimensions over mobile view scaling boundaries
+    html2canvas(target, { 
+        scale: 2, 
+        useCORS: true, 
+        logging: false, 
+        width: 794,
+        height: 1123,
+        scrollX: 0, 
+        scrollY: 0 
+    }).then(canvas => {
         let link = document.createElement("a");
         link.download = (document.getElementById("cardHolderName").innerText || "SGT_Card") + "_A4_Sheet.png";
         link.href = canvas.toDataURL("image/png"); link.click();
@@ -361,7 +410,7 @@ function downloadCardAsImage() {
 
 function shareOnWhatsApp() {
     let rawMob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
-    let cleanMob = rawMob.replace(/[^0-9]/g, ""); // Strips country codes perfectly clean
+    let cleanMob = rawMob.replace(/[^0-9]/g, "");
     let comp = document.getElementById("compName").value;
     let msg = `Hello Admin, Your system access card for ${comp} has been generated successfully. Click link to access your system page: ${systemUrl}`;
     window.open(`https://wa.me/${cleanMob}?text=${encodeURIComponent(msg)}`, '_blank');
