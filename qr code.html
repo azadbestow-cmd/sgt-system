@@ -10,7 +10,6 @@
         .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0px 10px 30px rgba(0,0,0,0.06); }
         h2 { color: #1e3c72; font-size: 22px; margin-top: 0; margin-bottom: 20px; font-weight: 800; }
         
-        /* Smooth Inputs & Panels */
         input, select { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 12px; border: 1px solid #ced4da; border-radius: 10px; font-size: 14px; transition: 0.2s; }
         input:focus { border-color: #1e3c72; outline: none; box-shadow: 0 0 0 3px rgba(30,60,114,0.1); }
         .phone-container { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -24,12 +23,11 @@
         .upload-section { background: #ffffff; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #e3e8ee; }
         .upload-section label { font-size: 12px; font-weight: 700; color: #495057; display: block; margin-bottom: 6px; }
         
-        /* 🪪 PREMIUM & BEAUTIFUL CR80 CARD DESIGN */
+        /* 🪪 PREMIUM CARD DESIGN */
         .badge-wrapper { display: none; margin-top: 25px; }
         .cards-print-container { display: flex; flex-direction: column; gap: 20px; align-items: center; }
-        .id-card { width: 340px; height: 215px; background: #ffffff; border-radius: 14px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); box-sizing: border-box; position: relative; overflow: hidden; border: 1px solid #e0e0e0; text-align: left; }
+        .id-card { width: 340px; height: 215px; background: #ffffff; border-radius: 14px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); box-sizing: border-box; position: relative; overflow: hidden; border: 1px solid #e0e0e0; text-align: left; background-color: #fff; }
         
-        /* Beautiful Premium Border Layout for Front Side */
         .card-front::before { content: ""; position: absolute; top: 0; left: 0; width: 8px; height: 100%; background: linear-gradient(to bottom, #1e3c72, #2a5298); }
         .card-front::after { content: ""; position: absolute; bottom: -30px; right: -30px; width: 120px; height: 120px; background: rgba(30, 60, 114, 0.03); border-radius: 50%; }
         
@@ -49,7 +47,7 @@
         .front-info-fields .holder-role { font-size: 10px; font-weight: 700; color: #e67e22; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
         .info-row { margin-bottom: 2px; }
         
-        .front-qr-box { width: 55px; height: 55px; background: white; border: 1px solid #e0e0e0; padding: 2px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+        .front-qr-box { width: 55px; height: 55px; background: white; border: 1px solid #e0e0e0; padding: 2px; border-radius: 6px; }
         .front-qr-box img { width: 100%; height: 100%; }
         
         .front-bottom-row { display: flex; justify-content: space-between; align-items: flex-end; position: absolute; bottom: 10px; left: 22px; right: 15px; font-size: 8px; color: #6c757d; }
@@ -67,6 +65,15 @@
 
         .video-box { width: 100%; height: 160px; background: #000; border-radius: 10px; margin-top: 8px; margin-bottom: 5px; display: none; object-fit: cover; border: 2px solid #ced4da; }
         #reader { width: 100%; border-radius: 16px; overflow: hidden; background: #000; margin-top: 15px; }
+
+        /* 🖨️ PERFECT CR80 PRINT MEDIA QUERY FORMATTING */
+        @media print {
+            body, html { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+            .container, .panel, h2, #reader, #mainSub, button, .upload-section { display: none !important; }
+            .badge-wrapper { display: block !important; margin: 0 !important; padding: 0 !important; }
+            .cards-print-container { gap: 30px !important; margin-top: 20px !important; page-break-inside: avoid; }
+            .id-card { box-shadow: none !important; border: 1px solid #000 !important; page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body>
@@ -95,7 +102,7 @@
         <div class="upload-section">
             <label>2. Owner Photo (File or Live Camera):</label>
             <input type="file" id="ownerPhotoUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:5px;">
-            <button type="button" class="cam-btn" onclick="openCam('owner')">📸 Take Photo from Camera</button>
+            <button type="button" class="cam-btn" id="ownerCamBtn" onclick="openCam('owner')">📸 Take Photo from Camera</button>
             <video id="ownerVideo" class="video-box" autoplay playsinline></video>
             <button type="button" id="ownerSnapBtn" style="background:#6f42c1; display:none; margin-bottom:5px;" onclick="snapCam('owner')">🎯 Capture Snapshot</button>
             <input type="hidden" id="ownerCapturedData">
@@ -103,14 +110,13 @@
         
         <div class="upload-section">
             <label>3. Take Photo of Signature Paper:</label>
-            <button type="button" class="cam-btn" style="background-color: #6f42c1;" onclick="openCam('sig')">📸 Open Camera for Signature</button>
+            <button type="button" class="cam-btn" id="sigCamBtn" style="background-color: #6f42c1;" onclick="openCam('sig')">📸 Open Camera for Signature</button>
             <video id="sigVideo" class="video-box" autoplay playsinline></video>
             <button type="button" id="sigSnapBtn" style="background:#28a745; display:none;" onclick="snapCam('sig')">🎯 Take Signature Photo</button>
             <input type="hidden" id="sigCapturedData">
         </div>
         
         <button onclick="generateClient()" style="margin-top:15px; background:#28a745; padding: 14px;">Create Client & Generate Beautiful Card</button>
-        <div id="superQrOutput" style="margin-top:15px; text-align:center;"></div>
     </div>
 
     <div class="panel" id="clientAdminPanel">
@@ -127,7 +133,7 @@
         <div class="upload-section">
             <label>Staff Photo (File or Camera):</label>
             <input type="file" id="staffPhotoUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:5px;">
-            <button type="button" class="cam-btn" onclick="openCam('staff')">📸 Take Staff Live Photo</button>
+            <button type="button" class="cam-btn" id="staffCamBtn" onclick="openCam('staff')">📸 Take Staff Live Photo</button>
             <video id="staffVideo" class="video-box" autoplay playsinline></video>
             <button type="button" id="staffSnapBtn" style="background:#6f42c1; display:none;" onclick="snapCam('staff')">🎯 Capture Staff Photo</button>
             <input type="hidden" id="staffCapturedData">
@@ -183,21 +189,20 @@
                 <div class="back-footer">Powered by Softwire</div>
             </div>
         </div>
-        <button onclick="window.print()" style="background-color:#28a745; margin-top:15px; padding: 12px;">🖨️ Download / Print Cards (CR80)</button>
+        <button onclick="window.print()" style="background-color:#28a745; margin-top:15px; padding: 12px;">🖨️ Download PDF / Print Cards</button>
         <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px; display:none;" onclick="shareOnWhatsApp()">💬 Send via WhatsApp</button>
     </div>
     <canvas id="photoCanvas" style="display:none;"></canvas>
 </div>
 
 <script>
-let html5QrCode; let localStream; 
+let html5QrCode; let localStream = null; 
 let uploadedLogoBase64 = ""; let uploadedOwnerPhotoBase64 = ""; let uploadedSigBase64 = "";
 let currentClientCompany = ""; let currentClientCity = ""; let currentClientMob = ""; let globalSystemUrl = "";
 let currentClientSlogan = "";
 const systemUrl = "https://azadbestow-cmd.github.io/sgt-system/qr%20code.html";
 const webAppUrl = "https://script.google.com/macros/s/AKfycbxNa51uPFhMwD9Wi6CWbztmQpG5UyHttWjOmhKf-TkHsCmMSmn8wqr8d3Dq_H5ol2o/exec";
 
-// File Conversion Handles
 document.getElementById('logoUpload').addEventListener('change', function(e) { handleFile(e, data => uploadedLogoBase64 = data); });
 document.getElementById('ownerPhotoUpload').addEventListener('change', function(e) { handleFile(e, data => uploadedOwnerPhotoBase64 = data); });
 document.getElementById('staffPhotoUpload').addEventListener('change', function(e) { handleFile(e, data => document.getElementById('staffCapturedData').value = data); });
@@ -227,12 +232,28 @@ function onScanSuccess(decodedText) {
     }
 }
 
+// 🎯 CAMERA FORCE STOP AND SWITCH MECHANISM FIXED
+function stopActiveStream() {
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+    }
+    document.querySelectorAll('.video-box').forEach(v => v.style.display = 'none');
+    document.querySelectorAll('[id$="SnapBtn"]').forEach(b => b.style.display = 'none');
+}
+
 function openCam(type) {
+    stopActiveStream(); // Stop any active camera first
     let video = document.getElementById(type + "Video");
     let btn = document.getElementById(type + "SnapBtn");
     video.style.display = "block"; btn.style.display = "block";
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: type === 'sig' ? "environment" : "user" } }).then(stream => {
+    
+    navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: type === 'sig' ? "environment" : "user" } 
+    }).then(stream => {
         localStream = stream; video.srcObject = stream;
+    }).catch(err => {
+        alert("Camera opening failed. Please allow permissions.");
     });
 }
 
@@ -247,8 +268,7 @@ function snapCam(type) {
     if(type === 'sig') uploadedSigBase64 = dataUrl;
     if(type === 'staff') document.getElementById("staffCapturedData").value = dataUrl;
     
-    localStream.getTracks().forEach(track => track.stop());
-    video.style.display = "none"; document.getElementById(type + "SnapBtn").style.display = "none";
+    stopActiveStream(); // Auto-turn off stream immediately after snapshot
 }
 
 function getGPSLocation(callback) { navigator.geolocation.getCurrentPosition((pos) => callback(`${pos.coords.latitude},${pos.coords.longitude}`), () => callback("Permission Denied")); }
@@ -313,9 +333,13 @@ function createStaffBadge() {
     });
 }
 
+// 💬 WHATSAPP STRIPPED CLEAN LINK FORMATTING FIXED
 function shareOnWhatsApp() {
-    let mob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
-    window.open(`https://wa.me/${mob.replace('+', '')}?text=System Card Generated. Link: ${systemUrl}`, '_blank');
+    let rawMob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
+    let cleanMob = rawMob.replace(/[^0-9]/g, ""); // Remove plus, spaces, dashes
+    let comp = document.getElementById("compName").value;
+    let msg = `Hello Admin, Your system access card for ${comp} has been generated successfully. Click link to access your system page: ${systemUrl}`;
+    window.open(`https://wa.me/${cleanMob}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 </script>
 </body>
