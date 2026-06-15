@@ -20,12 +20,16 @@
         .upload-section { background: #ffffff; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #e3e8ee; }
         .upload-section label { font-size: 12px; font-weight: 700; color: #495057; display: block; margin-bottom: 6px; }
         
-        /* 🪪 PREMIUM CARD DESIGN */
+        /* 🪪 PREMIUM CR80 STANDARD CARD (85.6mm x 53.9mm proportional) */
         .badge-wrapper { display: none; margin-top: 25px; }
-        .cards-print-container { display: flex; flex-direction: column; gap: 20px; align-items: center; background-color: transparent; padding: 5px; }
-        .id-card { width: 340px; height: 215px; background: #ffffff; border-radius: 14px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); box-sizing: border-box; position: relative; overflow: hidden; border: 1px solid #e0e0e0; text-align: left; }
+        
+        /* Hidden A4 Export Wrapper - Only active during rendering/printing */
+        .a4-export-sheet { background-color: #ffffff; width: 595px; height: 842px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; box-sizing: border-box; padding: 50px; margin: auto; }
+        
+        .id-card { width: 340px; height: 215px; background: #ffffff; border-radius: 14px; box-sizing: border-box; position: relative; overflow: hidden; border: 1px solid #b0b0b0; text-align: left; background-color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .card-front { padding: 15px 15px 15px 22px; }
         .card-front::before { content: ""; position: absolute; top: 0; left: 0; width: 8px; height: 100%; background: linear-gradient(to bottom, #1e3c72, #2a5298); }
+        
         .front-top-bar { display: flex; justify-content: space-between; align-items: start; margin-bottom: 2px; }
         .front-comp-title { font-size: 15px; font-weight: 800; color: #1e3c72; text-transform: uppercase; }
         .front-comp-slogan { font-size: 8px; font-weight: 600; color: #6c757d; text-transform: uppercase; margin-top: -2px; }
@@ -44,7 +48,7 @@
         .front-sig-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
         /* BACK SIDE DESIGN */
-        .card-back { background: #fdfdfd; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 1px solid #e0e0e0; }
+        .card-back { background: #fdfdfd; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .card-back::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: #1e3c72; }
         .back-title { font-size: 13px; font-weight: 800; color: #1e3c72; margin-bottom: 10px; text-transform: uppercase; }
         .back-qr-box { width: 90px; height: 90px; background: white; padding: 5px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 10px; }
@@ -55,14 +59,18 @@
         .video-box { width: 100%; height: 160px; background: #000; border-radius: 10px; margin-top: 8px; margin-bottom: 5px; display: none; object-fit: cover; border: 2px solid #ced4da; }
         #reader { width: 100%; border-radius: 16px; overflow: hidden; background: #000; margin-top: 15px; }
 
+        /* Mobile View Scaling Optimization */
+        @media screen and (max-width: 600px) {
+            .a4-export-sheet { width: 100% !important; height: auto !important; padding: 10px !important; gap: 15px !important; background: transparent !important; }
+        }
+
+        /* 🖨️ PERFECT HARDWARE A4 PRINT ENFORCEMENT */
         @media print {
-            html, body { background: #fff !important; margin: 0px !important; padding: 0px !important; }
+            html, body { background: #ffffff !important; margin: 0px !important; padding: 0px !important; }
             body * { visibility: hidden !important; }
-            .badge-wrapper, .badge-wrapper *, .cards-print-container, .cards-print-container *, .id-card, .id-card * { visibility: visible !important; }
+            .badge-wrapper, .badge-wrapper *, .a4-export-sheet, .a4-export-sheet *, .id-card, .id-card * { visibility: visible !important; }
             .container, .panel, h2, #reader, #mainSub, button, .upload-section { display: none !important; }
-            .badge-wrapper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; margin: 0 !important; }
-            .cards-print-container { gap: 25px !important; display: flex !important; flex-direction: column !important; align-items: center !important; }
-            .id-card { box-shadow: none !important; border: 1px solid #bbb !important; page-break-inside: avoid !important; }
+            .a4-export-sheet { position: absolute !important; left: 0 !important; top: 0 !important; width: 595px !important; height: 842px !important; display: flex !important; background: #fff !important; }
         }
     </style>
 </head>
@@ -133,7 +141,7 @@
     </div>
 
     <div class="badge-wrapper" id="badgeWrapper">
-        <div class="cards-print-container" id="printableCardsArea">
+        <div class="a4-export-sheet" id="printableCardsArea">
             <div class="id-card card-front">
                 <div class="front-top-bar">
                     <div>
@@ -178,8 +186,8 @@
             </div>
         </div>
         
-        <button onclick="downloadCardAsImage()" style="background-color:#ff9800; margin-top:20px;">📥 SAVE TO GALLERY (HIGH-QUALITY)</button>
-        <button onclick="window.print()" style="background-color:#28a745; margin-top:5px;">🖨️ Save as PDF / Print</button>
+        <button onclick="downloadCardAsImage()" style="background-color:#ff9800; margin-top:20px;">📥 SAVE A4 LAYOUT TO GALLERY</button>
+        <button onclick="window.print()" style="background-color:#28a745; margin-top:5px;">🖨️ SAVE AS PDF / PRINT</button>
         <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px;" onclick="shareOnWhatsApp()">💬 Send Card via WhatsApp</button>
     </div>
     <canvas id="photoCanvas" style="display:none;"></canvas>
@@ -306,11 +314,22 @@ function createStaffBadge() {
     });
 }
 
+// 📥 FORCE RESOLUTION ENFORCEMENT ON FIXED VERTICAL A4 SHEET FORMAT
 function downloadCardAsImage() {
     let target = document.getElementById("printableCardsArea");
-    html2canvas(target, { scale: 3, useCORS: true, backgroundColor: "#f4f6f9" }).then(canvas => {
+    
+    // Backup responsive inline view layout properties temporarily
+    let origWidth = target.style.width; let origHeight = target.style.height; let origBg = target.style.backgroundColor;
+    
+    // Hard lock dimensions to exact standard 72 DPI A4 dimensions for html2canvas engine execution 
+    target.style.width = "595px"; target.style.height = "842px"; target.style.backgroundColor = "#ffffff";
+    
+    html2canvas(target, { scale: 3, useCORS: true, logging: false }).then(canvas => {
+        // Restore dimensions post calculation loop sequence 
+        target.style.width = origWidth; target.style.height = origHeight; target.style.backgroundColor = origBg;
+        
         let link = document.createElement("a");
-        link.download = (document.getElementById("cardHolderName").innerText || "SGT-Card") + "_Identity.png";
+        link.download = (document.getElementById("cardHolderName").innerText || "SGT-Card") + "_A4_PrintSheet.png";
         link.href = canvas.toDataURL("image/png"); link.click();
     });
 }
@@ -318,9 +337,7 @@ function downloadCardAsImage() {
 function shareOnWhatsApp() {
     let mob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
     let cleanMob = mob.replace(/[^0-9]/g, "");
-    let comp = document.getElementById("compName").value;
-    let msg = `Hello Admin, Your system access card for ${comp} has been generated successfully. Click link to access your system page: ${systemUrl}`;
-    window.open(`https://wa.me/${cleanMob}?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://wa.me/${cleanMob}?text=System Card Generated. Link: ${systemUrl}`, '_blank');
 }
 </script>
 </body>
