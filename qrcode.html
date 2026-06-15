@@ -6,6 +6,7 @@
     <title>Softwire Enterprise Identity System</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; background-color: #f4f6f9; padding: 15px; margin: 0; color: #333; }
         .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0px 10px 30px rgba(0,0,0,0.06); }
@@ -17,30 +18,30 @@
         button { background-color: #1e3c72; color: white; border: none; padding: 12px; font-size: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
         .cam-btn { background-color: #00b4d8; margin-bottom: 8px; }
         .stop-btn { background-color: #dc3545; margin-bottom: 8px; display: none; }
-        .panel { display: none; margin-top: 20px; text-align: left; padding: 20px; border: 1px solid #e9ecef; border-radius: 166px; background: #f8f9fa; border-radius: 16px; }
+        .panel { display: none; margin-top: 20px; text-align: left; padding: 20px; border: 1px solid #e9ecef; border-radius: 16px; background: #f8f9fa; }
         .upload-section { background: #ffffff; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #e3e8ee; }
         .upload-section label { font-size: 12px; font-weight: 700; color: #495057; display: block; margin-bottom: 6px; }
         
-        /* 🖨️ FIXED A4 SHEET LAYOUT */
+        /* 🖨️ ABSOLUTE FIXED A4 STRUCTURAL CONTAINER */
         .badge-wrapper { display: none; margin-top: 25px; }
         
         .a4-container-frame { 
-            width: 794px !important; 
-            height: 1123px !important; 
+            width: 595px !important; 
+            height: 842px !important; 
             background: #ffffff !important; 
             margin: 20px auto; 
-            padding: 50px; 
+            padding: 40px; 
             box-sizing: border-box; 
-            border: 2px solid #ccc; 
+            border: 1px solid #ccc; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: flex-start; 
-            gap: 50px; 
+            gap: 40px; 
             position: relative;
         }
 
-        /* HARD CR80 PLASTIC CARD SIZE LOCK (85.6mm x 54mm) */
+        /* HARD HARDWARE PVC CR80 PRINT LOCK (85.6mm x 54mm equivalent) */
         .id-card { 
             width: 324px !important; 
             height: 204px !important; 
@@ -51,7 +52,6 @@
             overflow: hidden; 
             border: 1.5px solid #222222; 
             text-align: left; 
-            box-shadow: none !important;
         }
         
         .card-front { padding: 12px 12px 12px 22px; }
@@ -86,18 +86,9 @@
         .video-box { width: 100%; height: 160px; background: #000; border-radius: 10px; margin-top: 8px; margin-bottom: 5px; display: none; object-fit: cover; border: 2px solid #ced4da; }
         #reader { width: 100%; border-radius: 16px; overflow: hidden; background: #000; margin-top: 15px; }
 
-        @media screen and (max-width: 840px) {
+        @media screen and (max-width: 640px) {
             .scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
             .a4-container-frame { margin: 10px 0; transform-origin: top left; }
-        }
-
-        @media print {
-            @page { size: A4; margin: 0; }
-            body, html { background: #ffffff !important; margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .container, .panel, h2, #reader, #mainSub, button, .upload-section, .phone-container, .scroll-wrapper-buttons { display: none !important; visibility: hidden !important; }
-            .badge-wrapper { display: block !important; position: absolute !important; left: 0 !important; top: 0 !important; width: 794px !important; height: 1123px !important; }
-            .a4-container-frame { display: flex !important; width: 794px !important; height: 1123px !important; position: absolute !important; left: 0 !important; top: 0 !important; border: none !important; margin: 0 !important; padding: 50px !important; box-sizing: border-box !important; page-break-inside: avoid !important; }
-            .id-card { display: block !important; border: 1.5px solid #222 !important; }
         }
     </style>
 </head>
@@ -116,7 +107,7 @@
         
         <div class="phone-container">
             <input type="text" id="phoneCode" class="phone-code" value="+92">
-            <input type="text" id="clientMobile" class="phone-num" placeholder="3007654321">
+            <input type="text" id="clientMobile" class="phone-num" placeholder="0300 7654321 or +92300...">
         </div>
 
         <select id="clientDesig">
@@ -187,8 +178,7 @@
     <div class="badge-wrapper" id="badgeWrapper">
         <div class="scroll-wrapper">
             <div class="a4-container-frame" id="printableCardsArea">
-                
-                <div style="font-size: 14px; font-weight: bold; color: #1e3c72; border-bottom: 2px dashed #1e3c72; width: 100%; padding-bottom: 5px; text-align: left; margin-bottom: -20px;">
+                <div style="font-size: 13px; font-weight: bold; color: #1e3c72; border-bottom: 2px dashed #1e3c72; width: 100%; padding-bottom: 5px; text-align: left; margin-bottom: -15px;">
                     SOFTWIRE PRINT SYSTEM — STANDARD A4 LAYOUT SHEET
                 </div>
 
@@ -218,7 +208,7 @@
                         </div>
                         <div>
                             <div class="front-sig-box" id="cardSigContainer"></div>
-                            <div style="font-size:6px; text-align:center; margin-top:2px; font-weight: bold; color: #1e3c72;">SIGNATURE</div>
+                            <div style="font-size:5px; text-align:center; margin-top:2px; font-weight: bold; color: #1e3c72;">SIGNATURE</div>
                         </div>
                     </div>
                 </div>
@@ -234,17 +224,13 @@
                     </div>
                     <div class="back-footer">Powered by Softwire</div>
                 </div>
-                
-                <div style="position: absolute; bottom: 20px; font-size: 11px; color: #888; text-align: center; width: 100%;">
-                    Confidential — Internal Enterprise Identity Token Document Generated via Mobile Client Sync
-                </div>
             </div>
         </div>
         
-        <div class="scroll-wrapper-buttons">
+        <div>
             <button onclick="downloadCardAsImage()" style="background-color:#ff9800; margin-top:20px;">📥 SAVE A4 SHEET TO GALLERY</button>
-            <button onclick="window.print()" style="background-color:#28a745; margin-top:5px;">🖨️ PRINT SHEET / SAVE AS PDF</button>
-            <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px;" onclick="shareOnWhatsApp()">💬 Send Card via WhatsApp</button>
+            <button onclick="downloadDirectPDF()" style="background-color:#28a745; margin-top:5px;">🖨️ DOWNLOAD DIRECT A4 PDF</button>
+            <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px;" onclick="shareOnWhatsApp()">💬 Send Card Info via WhatsApp</button>
         </div>
     </div>
     <canvas id="photoCanvas" style="display:none;"></canvas>
@@ -306,11 +292,7 @@ function openCam(type) {
     video.style.display = "block"; snapBtn.style.display = "block"; stopBtn.style.display = "block"; camBtn.style.display = "none";
     
     navigator.mediaDevices.getUserMedia({ 
-        video: { 
-            facingMode: type === 'sig' ? "environment" : "user",
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-        } 
+        video: { facingMode: type === 'sig' ? "environment" : "user", width: { ideal: 1920 }, height: { ideal: 1080 } } 
     }).then(stream => { localStream = stream; video.srcObject = stream; });
 }
 
@@ -326,11 +308,28 @@ function snapCam(type) {
 
 function getGPSLocation(callback) { navigator.geolocation.getCurrentPosition((pos) => callback(`${pos.coords.latitude},${pos.coords.longitude}`), () => callback("Permission Denied")); }
 
+// AUTOMATIC DYNAMIC CONTACT AUTO-FORMATTER LOGIC
+function formatPakistaniNumber(inputCode, inputNumber) {
+    let combined = inputCode + inputNumber;
+    let clean = combined.replace(/[^0-9]/g, ""); // Remove plus, spaces, dashes
+    
+    // If number starts with 9200, fix it to 92
+    if (clean.startsWith("9203")) {
+        clean = "92" + clean.substring(3);
+    } else if (clean.startsWith("923") == false && clean.substring(1).startsWith("3")) {
+        // Handle 0300 conversions manually
+        clean = "92" + clean.substring(1);
+    }
+    return clean;
+}
+
 function generateClient() {
     let comp = document.getElementById("compName").value; let name = document.getElementById("clientName").value;
     let city = document.getElementById("clientCity").value; 
-    let rawMob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
-    let fullMobile = rawMob.replace(/[^0-9]/g, "");
+    
+    // Trigger dynamic number clean engine
+    let fullMobile = formatPakistaniNumber(document.getElementById("phoneCode").value, document.getElementById("clientMobile").value);
+    
     let desig = document.getElementById("clientDesig").value || "CEO"; let slogan = document.getElementById("compSlogan").value || "";
     if(!comp || !name) { alert("Fill fields!"); return; }
     
@@ -389,18 +388,24 @@ function createStaffBadge() {
 
 function downloadCardAsImage() {
     let target = document.getElementById("printableCardsArea");
-    html2canvas(target, { 
-        scale: 2, 
-        useCORS: true, 
-        logging: false, 
-        width: 794,
-        height: 1123,
-        scrollX: 0, 
-        scrollY: 0 
-    }).then(canvas => {
+    html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 794, height: 1123, scrollX: 0, scrollY: 0 }).then(canvas => {
         let link = document.createElement("a");
         link.download = (document.getElementById("cardHolderName").innerText || "SGT_Card") + "_A4_Sheet.png";
         link.href = canvas.toDataURL("image/png"); link.click();
+    });
+}
+
+// 🖨️ NEW INJECTED PDF GENERATION ENGINE — NO BLANK PAGES ON MOBILE PROFILES
+function downloadDirectPDF() {
+    let target = document.getElementById("printableCardsArea");
+    html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 794, height: 1123 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'pt', 'a4');
+        
+        // Render 1:1 crisp image block inside pure binary PDF structure stream
+        pdf.addImage(imgData, 'JPEG', 0, 0, 595, 842);
+        pdf.save((document.getElementById("cardHolderName").innerText || "SGT_Identity") + "_Document.pdf");
     });
 }
 
@@ -408,7 +413,10 @@ function shareOnWhatsApp() {
     let rawMob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
     let cleanMob = rawMob.replace(/[^0-9]/g, "");
     let comp = document.getElementById("compName").value;
-    let msg = `Hello Admin, Your system access card for ${comp} has been generated successfully. Click link to access your system page: ${systemUrl}`;
+    let name = document.getElementById("cardHolderName").innerText;
+    let desig = document.getElementById("cardHolderRole").innerText;
+    
+    let msg = `*SGT SECURE SYSTEM ACCESS*\n\n*Company:* ${comp}\n*Name:* ${name}\n*Designation:* ${desig}\n\nYour System Profile link has been generated successfully. Click here to open dashboard:\n🔗 ${systemUrl}`;
     window.open(`https://wa.me/${cleanMob}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 </script>
