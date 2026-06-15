@@ -20,66 +20,64 @@
         .upload-section { background: #ffffff; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #e3e8ee; }
         .upload-section label { font-size: 12px; font-weight: 700; color: #495057; display: block; margin-bottom: 6px; }
         
-        /* 🪪 FIXED STRUCTURAL SCREEN DISPLAY AND PRE-PRINT ZONE */
+        /* 🪪 RE-ENFORCED STRUCTURAL LAYOUT */
         .badge-wrapper { display: none; margin-top: 25px; }
         
-        /* EXACT STANDARD RE-ENFORCED A4 CONTAINER LAYER (595px X 842px matches 72dpi standard) */
-        .a4-export-sheet { background-color: #ffffff; width: 595px; height: 842px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 35px; box-sizing: border-box; padding: 40px; margin: auto; border: 1px dashed #bbb; position: relative; }
+        /* STRICT A4 SHEET STRUCTURE AT 72 DPI FOR IMAGE & PDF INTERACTION */
+        .a4-export-sheet { background-color: #ffffff; width: 595px; height: 842px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; box-sizing: border-box; padding: 40px; margin: auto; border: 1px dashed #bbb; background-image: radial-gradient(#f0f0f0 1px, transparent 0); background-size: 10px 10px; }
         
-        /* EXACT LOGICAL HARD LOCK SIZE FOR CR80 PLASTIC CARD PRINTING (85.6mm x 53.9mm scaled accurately) */
-        .id-card { width: 324px !important; height: 204px !important; background: #ffffff; border-radius: 12px; box-sizing: border-box; position: relative; overflow: hidden; border: 1.5px solid #a0a0a0; text-align: left; background-color: #fff; display: block !important; }
+        /* HARD PHYSICAL LOCK DIMENSIONS FOR STANDARD CR80 PVC PLASTIC CARD (3.375in x 2.125in) */
+        .id-card { width: 3.375in !important; height: 2.125in !important; background: #ffffff !important; border-radius: 0.125in; box-sizing: border-box; position: relative; overflow: hidden; border: 1.5px solid #999999; text-align: left; display: block !important; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transform: scale(1); }
         
-        .card-front { padding: 12px 12px 12px 20px; }
+        .card-front { padding: 12px 12px 12px 22px; }
         .card-front::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: linear-gradient(to bottom, #1e3c72, #2a5298); }
         
         .front-top-bar { display: flex; justify-content: space-between; align-items: start; margin-bottom: 2px; }
-        .front-comp-title { font-size: 14px; font-weight: 800; color: #1e3c72; text-transform: uppercase; }
-        .front-comp-slogan { font-size: 8px; font-weight: 600; color: #6c757d; text-transform: uppercase; margin-top: -2px; }
-        .front-comp-logo { max-height: 22px; max-width: 70px; object-fit: contain; border-radius: 2px; }
-        .front-sub-tag { font-size: 7px; font-weight: 700; color: #fff; background: #1e3c72; padding: 2px 6px; border-radius: 20px; display: inline-block; margin-top: 2px; text-transform: uppercase; }
-        .front-main-body { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+        .front-comp-title { font-size: 13px; font-weight: 800; color: #1e3c72; text-transform: uppercase; }
+        .front-comp-slogan { font-size: 7px; font-weight: 600; color: #6c757d; text-transform: uppercase; margin-top: -2px; }
+        .front-comp-logo { max-height: 22px; max-width: 65px; object-fit: contain; border-radius: 2px; }
+        .front-sub-tag { font-size: 7px; font-weight: 700; color: #fff; background: #1e3c72; padding: 1px 6px; border-radius: 10px; display: inline-block; margin-top: 1px; text-transform: uppercase; }
+        .front-main-body { display: flex; gap: 10px; margin-top: 8px; align-items: center; }
         .front-photo-frame { width: 72px; height: 82px; background: #f8f9fa; border-radius: 6px; overflow: hidden; border: 1.5px solid #1e3c72; }
         .front-photo-frame img { width: 100%; height: 100%; object-fit: cover; }
         .front-info-fields { flex: 1; font-size: 9px; line-height: 1.4; color: #495057; }
-        .front-info-fields .holder-name { font-size: 14px; font-weight: 800; color: #1e3c72; text-transform: uppercase; }
-        .front-info-fields .holder-role { font-size: 9px; font-weight: 700; color: #e67e22; text-transform: uppercase; margin-bottom: 4px; }
-        .info-row { margin-bottom: 1px; }
+        .front-info-fields .holder-name { font-size: 13px; font-weight: 800; color: #1e3c72; text-transform: uppercase; }
+        .front-info-fields .holder-role { font-size: 9px; font-weight: 700; color: #e67e22; text-transform: uppercase; margin-bottom: 2px; }
         
-        .front-qr-box { width: 50px; height: 50px; background: white; border: 1px solid #e0e0e0; padding: 2px; border-radius: 4px; }
+        .front-qr-box { width: 48px; height: 48px; background: white; border: 1px solid #e0e0e0; padding: 2px; border-radius: 4px; }
         .front-qr-box img { width: 100%; height: 100%; }
-        .front-bottom-row { display: flex; justify-content: space-between; align-items: flex-end; position: absolute; bottom: 8px; left: 20px; right: 12px; font-size: 8px; color: #6c757d; }
-        .front-sig-box { width: 60px; height: 22px; border-bottom: 1px solid #ced4da; text-align: center; display: flex; align-items: center; justify-content: center; }
+        .front-bottom-row { display: flex; justify-content: space-between; align-items: flex-end; position: absolute; bottom: 8px; left: 22px; right: 12px; font-size: 7px; color: #6c757d; }
+        .front-sig-box { width: 55px; height: 20px; border-bottom: 1px solid #ced4da; text-align: center; display: flex; align-items: center; justify-content: center; }
         .front-sig-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
         /* BACK SIDE DESIGN */
         .card-back { background: #fdfdfd; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .card-back::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #1e3c72; }
-        .back-title { font-size: 12px; font-weight: 800; color: #1e3c72; margin-bottom: 8px; text-transform: uppercase; }
-        .back-qr-box { width: 85px; height: 85px; background: white; padding: 4px; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 8px; }
+        .back-title { font-size: 11px; font-weight: 800; color: #1e3c72; margin-bottom: 6px; text-transform: uppercase; }
+        .back-qr-box { width: 80px; height: 80px; background: white; padding: 3px; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 6px; }
         .back-qr-box img { width: 100%; height: 100%; }
-        .back-desc { font-size: 7px; color: #6c757d; line-height: 1.3; width: 92%; margin-bottom: 8px; }
-        .back-footer { font-size: 8px; font-weight: bold; color: #2a5298; text-transform: uppercase; border-top: 1px solid #eee; width: 100%; padding-top: 4px; }
+        .back-desc { font-size: 7px; color: #6c757d; line-height: 1.3; width: 95%; margin-bottom: 6px; }
+        .back-footer { font-size: 7px; font-weight: bold; color: #2a5298; text-transform: uppercase; border-top: 1px solid #eee; width: 100%; padding-top: 4px; }
 
         .video-box { width: 100%; height: 160px; background: #000; border-radius: 10px; margin-top: 8px; margin-bottom: 5px; display: none; object-fit: cover; border: 2px solid #ced4da; }
         #reader { width: 100%; border-radius: 16px; overflow: hidden; background: #000; margin-top: 15px; }
 
-        /* Mobile Container Scaling View Fix overrides */
-        @media screen and (max-width: 620px) {
+        @media screen and (max-width: 640px) {
             .a4-export-sheet { width: 100% !important; height: auto !important; padding: 15px 5px !important; gap: 15px !important; background: #fff !important; border: none !important; }
         }
 
-        /* 🖨️ HARDWARE A4 SYSTEM GRAPHICS ENGINE SYNC */
+        /* 🖨️ CRITICAL FIX: MOBILE PRINT VIEW COMPATIBILITY RENDERER */
         @media print {
-            html, body { background: #ffffff !important; margin: 0px !important; padding: 0px !important; width: 210mm; height: 297mm; }
-            body * { visibility: hidden !important; }
-            .badge-wrapper, .badge-wrapper *, .a4-export-sheet, .a4-export-sheet *, .id-card, .id-card * { visibility: visible !important; }
-            .container, .panel, h2, #reader, #mainSub, button, .upload-section { display: none !important; }
-            .a4-export-sheet { position: absolute !important; left: 0 !important; top: 0 !important; width: 595px !important; height: 842px !important; display: flex !important; background: #fff !important; border: none !important; }
+            body, html { background: #ffffff !important; margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            #mainContainerApp, .container, .panel, h2, #reader, #mainSub, button, .upload-section, .phone-container { display: none !important; visibility: hidden !important; }
+            .badge-wrapper { display: block !important; position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; }
+            .a4-export-sheet { display: flex !important; width: 595px !important; height: 842px !important; position: absolute !important; left: 0 !important; top: 0 !important; border: none !important; background: #fff !important; margin: 0 !important; }
+            .id-card { display: block !important; box-shadow: none !important; border: 1px solid #777 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
     </style>
 </head>
 <body>
-<div class="container">
+<div class="container" id="mainContainerApp">
     <h2>SOFTWIRE ID MANAGER</h2>
     <p id="mainSub" style="color:#666; font-size:13px;">Loading Scanner...</p>
     <div id="reader"></div>
@@ -191,7 +189,7 @@
         </div>
         
         <button onclick="downloadCardAsImage()" style="background-color:#ff9800; margin-top:20px;">📥 SAVE A4 LAYOUT TO GALLERY</button>
-        <button onclick="window.print()" style="background-color:#28a745; margin-top:5px;">🖨️ SAVE AS PDF / PRINT (A4 READY)</button>
+        <button onclick="window.print()" style="background-color:#28a745; margin-top:5px;">🖨️ SAVE AS PDF / PRINT</button>
         <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px;" onclick="shareOnWhatsApp()">💬 Send Card via WhatsApp</button>
     </div>
     <canvas id="photoCanvas" style="display:none;"></canvas>
@@ -202,7 +200,9 @@ let html5QrCode; let localStream = null;
 let uploadedLogoBase64 = ""; let uploadedOwnerPhotoBase64 = ""; let uploadedSigBase64 = "";
 let currentClientCompany = ""; let currentClientCity = ""; let currentClientMob = ""; let globalSystemUrl = "";
 let currentClientSlogan = "";
-const systemUrl = "https://azadbestow-cmd.github.io/sgt-system/qr%20code.html";
+
+// 🎯 STANDARD STABLE SUB-URL REDIRECTION FIXED (NO 404 SPACE ERRORS)
+const systemUrl = "https://azadbestow-cmd.github.io/sgt-system/qrcode.html";
 const webAppUrl = "https://script.google.com/macros/s/AKfycbxNa51uPFhMwD9Wi6CWbztmQpG5UyHttWjOmhKf-TkHsCmMSmn8wqr8d3Dq_H5ol2o/exec";
 
 document.getElementById('logoUpload').addEventListener('change', function(e) { handleFile(e, data => uploadedLogoBase64 = data); });
@@ -318,20 +318,16 @@ function createStaffBadge() {
     });
 }
 
-// 📥 HIGH QUALITY A4 CONSTRAINED GENERATION FUNCTION FIXED
+// 📥 SCREEN CLONE RENDER FOR EXACT HIGH-QUALITY A4 OUTPUT DOWNLOAD
 function downloadCardAsImage() {
     let target = document.getElementById("printableCardsArea");
+    let origW = target.style.width; let origH = target.style.height; let origBg = target.style.backgroundColor;
     
-    // Save live layout properties
-    let origW = target.style.width; let origH = target.style.height; let origBg = target.style.backgroundColor; let origPos = target.style.position;
-    
-    // Force standard pixel lock values to emulate exact clean A4 vertical grid sizing boundaries 
-    target.style.width = "595px"; target.style.height = "842px"; target.style.backgroundColor = "#ffffff"; target.style.position = "relative";
+    // Hard scale parameters set to replicate raw print boundaries instantly
+    target.style.width = "595px"; target.style.height = "842px"; target.style.backgroundColor = "#ffffff";
     
     html2canvas(target, { scale: 3, useCORS: true, logging: false, scrollX: 0, scrollY: 0 }).then(canvas => {
-        // Restore standard live interface structure properties instantly
-        target.style.width = origW; target.style.height = origH; target.style.backgroundColor = origBg; target.style.position = origPos;
-        
+        target.style.width = origW; target.style.height = origH; target.style.backgroundColor = origBg;
         let link = document.createElement("a");
         link.download = (document.getElementById("cardHolderName").innerText || "SGT_Card") + "_A4_Sheet.png";
         link.href = canvas.toDataURL("image/png"); link.click();
