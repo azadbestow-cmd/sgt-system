@@ -22,9 +22,37 @@
         .upload-section { background: #ffffff; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #e3e8ee; }
         .upload-section label { font-size: 12px; font-weight: 700; color: #495057; display: block; margin-bottom: 6px; }
         
+        /* 🖨️ FIXED RELIABLE A4 STRUCTURAL CONTAINER FOR PRINT & EXPORT */
         .badge-wrapper { display: none; margin-top: 25px; }
-        .a4-container-frame { width: 595px !important; height: 842px !important; background: #ffffff !important; margin: 20px auto; padding: 40px; box-sizing: border-box; border: 1px solid #ccc; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 40px; position: relative; }
-        .id-card { width: 324px !important; height: 204px !important; background: #ffffff !important; border-radius: 12px; box-sizing: border-box; position: relative; overflow: hidden; border: 1.5px solid #222222; text-align: left; }
+        
+        .a4-container-frame { 
+            width: 595px !important; 
+            height: 842px !important; 
+            background: #ffffff !important; 
+            margin: 20px auto; 
+            padding: 50px; 
+            box-sizing: border-box; 
+            border: 1px solid #ccc; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; 
+            gap: 40px; 
+            position: relative;
+        }
+
+        /* HARD CR80 PLASTIC CARD PRINT LOCK (85.6mm x 54mm) */
+        .id-card { 
+            width: 324px !important; 
+            height: 204px !important; 
+            background: #ffffff !important; 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            position: relative; 
+            overflow: hidden; 
+            border: 1.5px solid #222222; 
+            text-align: left; 
+        }
         
         .card-front { padding: 12px 12px 12px 22px; }
         .card-front::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: linear-gradient(to bottom, #1e3c72, #2a5298); }
@@ -253,7 +281,6 @@ function stopActiveStream() {
     document.querySelectorAll('.cam-btn').forEach(b => b.style.display = 'block');
 }
 
-// 🎯 STANDARD RESOLUTION AUTOMATIC FALLBACK ENGINE (FIXED "CAMERA REQUIRED" BLOCKS)
 function openCam(type) {
     stopActiveStream();
     let video = document.getElementById(type + "Video"); 
@@ -264,17 +291,16 @@ function openCam(type) {
     video.style.display = "block"; snapBtn.style.display = "block"; stopBtn.style.display = "block";
     if(camBtn) camBtn.style.display = "none";
     
-    // Using simple stable constraints that every mobile device can easily open instantly
     navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: type === 'sig' ? "environment" : "user" } 
     }).then(stream => { localStream = stream; video.srcObject = stream; })
-      .catch(err => { alert("Camera Permission Blocked. Enable phone camera rights."); });
+      .catch(err => { alert("Camera initialization failed. Check permissions."); });
 }
 
 function snapCam(type) {
     let video = document.getElementById(type + "Video"); let canvas = document.getElementById("photoCanvas");
     canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0);
-    let dataUrl = canvas.toDataURL('image/jpeg', 0.9); // Optimized for compression size & sheet stability
+    let dataUrl = canvas.toDataURL('image/jpeg', 0.9);
     if(type === 'owner') uploadedOwnerPhotoBase64 = dataUrl;
     if(type === 'sig') uploadedSigBase64 = dataUrl;
     if(type === 'staff') document.getElementById("staffCapturedData").value = dataUrl;
@@ -353,7 +379,7 @@ function createStaffBadge() {
 
 function downloadCardAsImage() {
     let target = document.getElementById("printableCardsArea");
-    html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 794, height: 1123, scrollX: 0, scrollY: 0 }).then(canvas => {
+    html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 595, height: 842, scrollX: 0, scrollY: 0 }).then(canvas => {
         let link = document.createElement("a");
         link.download = (document.getElementById("cardHolderName").innerText || "SGT_Card") + "_A4_Sheet.png";
         link.href = canvas.toDataURL("image/png"); link.click();
@@ -362,7 +388,7 @@ function downloadCardAsImage() {
 
 function downloadDirectPDF() {
     let target = document.getElementById("printableCardsArea");
-    html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 794, height: 1123 }).then(canvas => {
+    html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 595, height: 842 }).then(canvas => {
         const imgData = canvas.toDataURL('image/jpeg', 0.9);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'pt', 'a4');
