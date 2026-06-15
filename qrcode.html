@@ -22,41 +22,12 @@
         .upload-section { background: #ffffff; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #e3e8ee; }
         .upload-section label { font-size: 12px; font-weight: 700; color: #495057; display: block; margin-bottom: 6px; }
         
-        /* 🖨️ ABSOLUTE FIXED A4 STRUCTURAL CONTAINER */
         .badge-wrapper { display: none; margin-top: 25px; }
-        
-        .a4-container-frame { 
-            width: 595px !important; 
-            height: 842px !important; 
-            background: #ffffff !important; 
-            margin: 20px auto; 
-            padding: 40px; 
-            box-sizing: border-box; 
-            border: 1px solid #ccc; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: flex-start; 
-            gap: 40px; 
-            position: relative;
-        }
-
-        /* HARD HARDWARE PVC CR80 PRINT LOCK (85.6mm x 54mm equivalent) */
-        .id-card { 
-            width: 324px !important; 
-            height: 204px !important; 
-            background: #ffffff !important; 
-            border-radius: 12px; 
-            box-sizing: border-box; 
-            position: relative; 
-            overflow: hidden; 
-            border: 1.5px solid #222222; 
-            text-align: left; 
-        }
+        .a4-container-frame { width: 595px !important; height: 842px !important; background: #ffffff !important; margin: 20px auto; padding: 40px; box-sizing: border-box; border: 1px solid #ccc; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 40px; position: relative; }
+        .id-card { width: 324px !important; height: 204px !important; background: #ffffff !important; border-radius: 12px; box-sizing: border-box; position: relative; overflow: hidden; border: 1.5px solid #222222; text-align: left; }
         
         .card-front { padding: 12px 12px 12px 22px; }
         .card-front::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: linear-gradient(to bottom, #1e3c72, #2a5298); }
-        
         .front-top-bar { display: flex; justify-content: space-between; align-items: start; margin-bottom: 2px; }
         .front-comp-title { font-size: 13px; font-weight: 800; color: #1e3c72; text-transform: uppercase; }
         .front-comp-slogan { font-size: 7px; font-weight: 600; color: #6c757d; text-transform: uppercase; margin-top: -2px; }
@@ -282,6 +253,7 @@ function stopActiveStream() {
     document.querySelectorAll('.cam-btn').forEach(b => b.style.display = 'block');
 }
 
+// 🎯 STANDARD RESOLUTION AUTOMATIC FALLBACK ENGINE (FIXED "CAMERA REQUIRED" BLOCKS)
 function openCam(type) {
     stopActiveStream();
     let video = document.getElementById(type + "Video"); 
@@ -289,17 +261,20 @@ function openCam(type) {
     let stopBtn = document.getElementById(type + "StopBtn");
     let camBtn = document.getElementById(type + "CamBtn");
     
-    video.style.display = "block"; snapBtn.style.display = "block"; stopBtn.style.display = "block"; camBtn.style.display = "none";
+    video.style.display = "block"; snapBtn.style.display = "block"; stopBtn.style.display = "block";
+    if(camBtn) camBtn.style.display = "none";
     
+    // Using simple stable constraints that every mobile device can easily open instantly
     navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: type === 'sig' ? "environment" : "user", width: { ideal: 1920 }, height: { ideal: 1080 } } 
-    }).then(stream => { localStream = stream; video.srcObject = stream; });
+        video: { facingMode: type === 'sig' ? "environment" : "user" } 
+    }).then(stream => { localStream = stream; video.srcObject = stream; })
+      .catch(err => { alert("Camera Permission Blocked. Enable phone camera rights."); });
 }
 
 function snapCam(type) {
     let video = document.getElementById(type + "Video"); let canvas = document.getElementById("photoCanvas");
     canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0);
-    let dataUrl = canvas.toDataURL('image/jpeg', 1.0);
+    let dataUrl = canvas.toDataURL('image/jpeg', 0.9); // Optimized for compression size & sheet stability
     if(type === 'owner') uploadedOwnerPhotoBase64 = dataUrl;
     if(type === 'sig') uploadedSigBase64 = dataUrl;
     if(type === 'staff') document.getElementById("staffCapturedData").value = dataUrl;
@@ -308,28 +283,18 @@ function snapCam(type) {
 
 function getGPSLocation(callback) { navigator.geolocation.getCurrentPosition((pos) => callback(`${pos.coords.latitude},${pos.coords.longitude}`), () => callback("Permission Denied")); }
 
-// AUTOMATIC DYNAMIC CONTACT AUTO-FORMATTER LOGIC
 function formatPakistaniNumber(inputCode, inputNumber) {
     let combined = inputCode + inputNumber;
-    let clean = combined.replace(/[^0-9]/g, ""); // Remove plus, spaces, dashes
-    
-    // If number starts with 9200, fix it to 92
-    if (clean.startsWith("9203")) {
-        clean = "92" + clean.substring(3);
-    } else if (clean.startsWith("923") == false && clean.substring(1).startsWith("3")) {
-        // Handle 0300 conversions manually
-        clean = "92" + clean.substring(1);
-    }
+    let clean = combined.replace(/[^0-9]/g, "");
+    if (clean.startsWith("9203")) { clean = "92" + clean.substring(3); }
+    else if (clean.startsWith("923") == false && clean.substring(1).startsWith("3")) { clean = "92" + clean.substring(1); }
     return clean;
 }
 
 function generateClient() {
     let comp = document.getElementById("compName").value; let name = document.getElementById("clientName").value;
     let city = document.getElementById("clientCity").value; 
-    
-    // Trigger dynamic number clean engine
     let fullMobile = formatPakistaniNumber(document.getElementById("phoneCode").value, document.getElementById("clientMobile").value);
-    
     let desig = document.getElementById("clientDesig").value || "CEO"; let slogan = document.getElementById("compSlogan").value || "";
     if(!comp || !name) { alert("Fill fields!"); return; }
     
@@ -395,15 +360,12 @@ function downloadCardAsImage() {
     });
 }
 
-// 🖨️ NEW INJECTED PDF GENERATION ENGINE — NO BLANK PAGES ON MOBILE PROFILES
 function downloadDirectPDF() {
     let target = document.getElementById("printableCardsArea");
     html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 794, height: 1123 }).then(canvas => {
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const imgData = canvas.toDataURL('image/jpeg', 0.9);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'pt', 'a4');
-        
-        // Render 1:1 crisp image block inside pure binary PDF structure stream
         pdf.addImage(imgData, 'JPEG', 0, 0, 595, 842);
         pdf.save((document.getElementById("cardHolderName").innerText || "SGT_Identity") + "_Document.pdf");
     });
