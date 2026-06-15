@@ -16,19 +16,16 @@
         .phone-num { flex: 1; padding: 12px; border: 1px solid #ced4da; border-radius: 10px; }
         button { background-color: #1e3c72; color: white; border: none; padding: 12px; font-size: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
         .cam-btn { background-color: #00b4d8; margin-bottom: 8px; }
+        .stop-btn { background-color: #dc3545; margin-bottom: 8px; display: none; }
         .panel { display: none; margin-top: 20px; text-align: left; padding: 20px; border: 1px solid #e9ecef; border-radius: 16px; background: #f8f9fa; }
         .upload-section { background: #ffffff; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #e3e8ee; }
         .upload-section label { font-size: 12px; font-weight: 700; color: #495057; display: block; margin-bottom: 6px; }
         
-        /* 🪪 RE-ENFORCED STRUCTURAL LAYOUT */
+        /* 🪪 PREMIUM CARD DESIGN */
         .badge-wrapper { display: none; margin-top: 25px; }
+        .a4-export-sheet { background-color: #ffffff; width: 595px; height: 842px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; box-sizing: border-box; padding: 40px; margin: auto; border: 1px dashed #bbb; }
         
-        /* STRICT A4 SHEET STRUCTURE AT 72 DPI FOR IMAGE & PDF INTERACTION */
-        .a4-export-sheet { background-color: #ffffff; width: 595px; height: 842px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; box-sizing: border-box; padding: 40px; margin: auto; border: 1px dashed #bbb; background-image: radial-gradient(#f0f0f0 1px, transparent 0); background-size: 10px 10px; }
-        
-        /* HARD PHYSICAL LOCK DIMENSIONS FOR STANDARD CR80 PVC PLASTIC CARD (3.375in x 2.125in) */
-        .id-card { width: 3.375in !important; height: 2.125in !important; background: #ffffff !important; border-radius: 0.125in; box-sizing: border-box; position: relative; overflow: hidden; border: 1.5px solid #999999; text-align: left; display: block !important; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transform: scale(1); }
-        
+        .id-card { width: 3.375in !important; height: 2.125in !important; background: #ffffff !important; border-radius: 0.125in; box-sizing: border-box; position: relative; overflow: hidden; border: 1.5px solid #999999; text-align: left; display: block !important; }
         .card-front { padding: 12px 12px 12px 22px; }
         .card-front::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: linear-gradient(to bottom, #1e3c72, #2a5298); }
         
@@ -50,11 +47,10 @@
         .front-sig-box { width: 55px; height: 20px; border-bottom: 1px solid #ced4da; text-align: center; display: flex; align-items: center; justify-content: center; }
         .front-sig-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* BACK SIDE DESIGN */
         .card-back { background: #fdfdfd; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .card-back::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #1e3c72; }
         .back-title { font-size: 11px; font-weight: 800; color: #1e3c72; margin-bottom: 6px; text-transform: uppercase; }
-        .back-qr-box { width: 80px; height: 80px; background: white; padding: 3px; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 6px; }
+        .back-qr-box { width: 80px; height: 80px; background: white; padding: 3px; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 8px; }
         .back-qr-box img { width: 100%; height: 100%; }
         .back-desc { font-size: 7px; color: #6c757d; line-height: 1.3; width: 95%; margin-bottom: 6px; }
         .back-footer { font-size: 7px; font-weight: bold; color: #2a5298; text-transform: uppercase; border-top: 1px solid #eee; width: 100%; padding-top: 4px; }
@@ -66,18 +62,17 @@
             .a4-export-sheet { width: 100% !important; height: auto !important; padding: 15px 5px !important; gap: 15px !important; background: #fff !important; border: none !important; }
         }
 
-        /* 🖨️ CRITICAL FIX: MOBILE PRINT VIEW COMPATIBILITY RENDERER */
         @media print {
-            body, html { background: #ffffff !important; margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            #mainContainerApp, .container, .panel, h2, #reader, #mainSub, button, .upload-section, .phone-container { display: none !important; visibility: hidden !important; }
+            html, body { background: #ffffff !important; margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .container, .panel, h2, #reader, #mainSub, button, .upload-section, .phone-container { display: none !important; visibility: hidden !important; }
             .badge-wrapper { display: block !important; position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; }
             .a4-export-sheet { display: flex !important; width: 595px !important; height: 842px !important; position: absolute !important; left: 0 !important; top: 0 !important; border: none !important; background: #fff !important; margin: 0 !important; }
-            .id-card { display: block !important; box-shadow: none !important; border: 1px solid #777 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .id-card { display: block !important; box-shadow: none !important; border: 1px solid #777 !important; }
         }
     </style>
 </head>
 <body>
-<div class="container" id="mainContainerApp">
+<div class="container">
     <h2>SOFTWIRE ID MANAGER</h2>
     <p id="mainSub" style="color:#666; font-size:13px;">Loading Scanner...</p>
     <div id="reader"></div>
@@ -88,11 +83,22 @@
         <input type="text" id="compSlogan" placeholder="Company Slogan (e.g., Quality First)">
         <input type="text" id="clientName" placeholder="Client Owner Name">
         <input type="text" id="clientCity" placeholder="City">
+        
         <div class="phone-container">
             <input type="text" id="phoneCode" class="phone-code" value="+92">
             <input type="text" id="clientMobile" class="phone-num" placeholder="3007654321">
         </div>
-        <input type="text" id="clientDesig" placeholder="Designation (e.g. Owner)">
+
+        <select id="clientDesig">
+            <option value="CEO">CEO</option>
+            <option value="Director">Director</option>
+            <option value="General Manager">General Manager</option>
+            <option value="Production Manager">Production Manager</option>
+            <option value="Quality Controller">Quality Controller</option>
+            <option value="Tech Engineer">Tech Engineer</option>
+            <option value="Supervisor">Supervisor</option>
+            <option value="Operator">Operator</option>
+        </select>
         
         <div class="upload-section">
             <label>1. Company Logo File:</label>
@@ -103,6 +109,7 @@
             <label>2. Owner Photo:</label>
             <input type="file" id="ownerPhotoUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:5px;">
             <button type="button" class="cam-btn" id="ownerCamBtn" onclick="openCam('owner')">📸 Take Photo from Camera</button>
+            <button type="button" class="stop-btn" id="ownerStopBtn" onclick="stopActiveStream()">❌ Stop Camera</button>
             <video id="ownerVideo" class="video-box" autoplay playsinline></video>
             <button type="button" id="ownerSnapBtn" style="background:#6f42c1; display:none;" onclick="snapCam('owner')">🎯 Capture Snapshot</button>
             <input type="hidden" id="ownerCapturedData">
@@ -111,6 +118,7 @@
         <div class="upload-section">
             <label>3. Take Photo of Signature Paper:</label>
             <button type="button" class="cam-btn" id="sigCamBtn" style="background-color: #6f42c1;" onclick="openCam('sig')">📸 Open Camera for Signature</button>
+            <button type="button" class="stop-btn" id="sigStopBtn" onclick="stopActiveStream()">❌ Stop Camera</button>
             <video id="sigVideo" class="video-box" autoplay playsinline></video>
             <button type="button" id="sigSnapBtn" style="background:#28a745; display:none;" onclick="snapCam('sig')">🎯 Take Signature Photo</button>
             <input type="hidden" id="sigCapturedData">
@@ -125,15 +133,19 @@
             <h3 id="adminTitle" style="margin:0;">👑 Client Dashboard</h3>
         </div>
         <input type="text" id="staffName" placeholder="Staff Full Name">
+        
         <select id="staffDesig">
             <option value="Machine Operator">Machine Operator</option>
             <option value="Service Engineer">Service Engineer</option>
+            <option value="Supervisor">Supervisor</option>
+            <option value="Quality Checker">Quality Checker</option>
         </select>
         
         <div class="upload-section">
             <label>Staff Photo:</label>
             <input type="file" id="staffPhotoUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:5px;">
             <button type="button" class="cam-btn" id="staffCamBtn" onclick="openCam('staff')">📸 Take Staff Live Photo</button>
+            <button type="button" class="stop-btn" id="staffStopBtn" onclick="stopActiveStream()">❌ Stop Camera</button>
             <video id="staffVideo" class="video-box" autoplay playsinline></video>
             <button type="button" id="staffSnapBtn" style="background:#6f42c1; display:none;" onclick="snapCam('staff')">🎯 Capture Staff Photo</button>
             <input type="hidden" id="staffCapturedData">
@@ -201,7 +213,7 @@ let uploadedLogoBase64 = ""; let uploadedOwnerPhotoBase64 = ""; let uploadedSigB
 let currentClientCompany = ""; let currentClientCity = ""; let currentClientMob = ""; let globalSystemUrl = "";
 let currentClientSlogan = "";
 
-// 🎯 STANDARD STABLE SUB-URL REDIRECTION FIXED (NO 404 SPACE ERRORS)
+// Stable exact endpoint (No spaces to avoid 404 Errors)
 const systemUrl = "https://azadbestow-cmd.github.io/sgt-system/qrcode.html";
 const webAppUrl = "https://script.google.com/macros/s/AKfycbxNa51uPFhMwD9Wi6CWbztmQpG5UyHttWjOmhKf-TkHsCmMSmn8wqr8d3Dq_H5ol2o/exec";
 
@@ -238,19 +250,33 @@ function stopActiveStream() {
     if (localStream) { localStream.getTracks().forEach(track => track.stop()); localStream = null; }
     document.querySelectorAll('.video-box').forEach(v => v.style.display = 'none');
     document.querySelectorAll('[id$="SnapBtn"]').forEach(b => b.style.display = 'none');
+    document.querySelectorAll('.stop-btn').forEach(b => b.style.display = 'none');
+    document.querySelectorAll('.cam-btn').forEach(b => b.style.display = 'block');
 }
 
+// 📸 HIGH RESOLUTION FULL-HD ENGINE SYNCED TO PREVENT BLUR IMAGES
 function openCam(type) {
     stopActiveStream();
-    let video = document.getElementById(type + "Video"); let btn = document.getElementById(type + "SnapBtn");
-    video.style.display = "block"; btn.style.display = "block";
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: type === 'sig' ? "environment" : "user" } }).then(stream => { localStream = stream; video.srcObject = stream; });
+    let video = document.getElementById(type + "Video"); 
+    let snapBtn = document.getElementById(type + "SnapBtn");
+    let stopBtn = document.getElementById(type + "StopBtn");
+    let camBtn = document.getElementById(type + "CamBtn");
+    
+    video.style.display = "block"; snapBtn.style.display = "block"; stopBtn.style.display = "block"; camBtn.style.display = "none";
+    
+    navigator.mediaDevices.getUserMedia({ 
+        video: { 
+            facingMode: type === 'sig' ? "environment" : "user",
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+        } 
+    }).then(stream => { localStream = stream; video.srcObject = stream; });
 }
 
 function snapCam(type) {
     let video = document.getElementById(type + "Video"); let canvas = document.getElementById("photoCanvas");
     canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0);
-    let dataUrl = canvas.toDataURL('image/jpeg');
+    let dataUrl = canvas.toDataURL('image/jpeg', 1.0); // 1.0 enforces full high quality crisp outputs
     if(type === 'owner') uploadedOwnerPhotoBase64 = dataUrl;
     if(type === 'sig') uploadedSigBase64 = dataUrl;
     if(type === 'staff') document.getElementById("staffCapturedData").value = dataUrl;
@@ -261,8 +287,10 @@ function getGPSLocation(callback) { navigator.geolocation.getCurrentPosition((po
 
 function generateClient() {
     let comp = document.getElementById("compName").value; let name = document.getElementById("clientName").value;
-    let city = document.getElementById("clientCity").value; let fullMobile = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
-    let desig = document.getElementById("clientDesig").value || "Owner"; let slogan = document.getElementById("compSlogan").value || "";
+    let city = document.getElementById("clientCity").value; 
+    let rawMob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
+    let fullMobile = rawMob.replace(/[^0-9]/g, ""); // Automatic dynamic link regex sanitizer
+    let desig = document.getElementById("clientDesig").value || "CEO"; let slogan = document.getElementById("compSlogan").value || "";
     if(!comp || !name) { alert("Fill fields!"); return; }
     
     getGPSLocation((geo) => {
@@ -276,7 +304,7 @@ function generateClient() {
         document.getElementById("cardCompSlogan").innerText = slogan.toUpperCase();
         document.getElementById("cardHeaderLogo").src = uploadedLogoBase64 || "https://via.placeholder.com/65x22?text=LOGO";
         document.getElementById("cardHolderName").innerText = name; document.getElementById("cardHolderRole").innerText = desig;
-        document.getElementById("cardHolderCity").innerText = city; document.getElementById("cardHolderMob").innerText = fullMobile;
+        document.getElementById("cardHolderCity").innerText = city; document.getElementById("cardHolderMob").innerText = "+" + fullMobile;
         document.getElementById("cardPhotoImg").src = uploadedOwnerPhotoBase64 || "https://via.placeholder.com/75x85?text=Owner";
         
         document.getElementById("frontQrContainer").innerHTML = `<img src="${frontQrUrl}">`;
@@ -318,12 +346,9 @@ function createStaffBadge() {
     });
 }
 
-// 📥 SCREEN CLONE RENDER FOR EXACT HIGH-QUALITY A4 OUTPUT DOWNLOAD
 function downloadCardAsImage() {
     let target = document.getElementById("printableCardsArea");
     let origW = target.style.width; let origH = target.style.height; let origBg = target.style.backgroundColor;
-    
-    // Hard scale parameters set to replicate raw print boundaries instantly
     target.style.width = "595px"; target.style.height = "842px"; target.style.backgroundColor = "#ffffff";
     
     html2canvas(target, { scale: 3, useCORS: true, logging: false, scrollX: 0, scrollY: 0 }).then(canvas => {
@@ -335,9 +360,11 @@ function downloadCardAsImage() {
 }
 
 function shareOnWhatsApp() {
-    let mob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
-    let cleanMob = mob.replace(/[^0-9]/g, "");
-    window.open(`https://wa.me/${cleanMob}?text=System Card Generated. Link: ${systemUrl}`, '_blank');
+    let rawMob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
+    let cleanMob = rawMob.replace(/[^0-9]/g, ""); // Strips country codes perfectly clean
+    let comp = document.getElementById("compName").value;
+    let msg = `Hello Admin, Your system access card for ${comp} has been generated successfully. Click link to access your system page: ${systemUrl}`;
+    window.open(`https://wa.me/${cleanMob}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 </script>
 </body>
