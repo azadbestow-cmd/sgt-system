@@ -91,7 +91,7 @@
 <script>
 let html5QrCode; let localStream; let uploadedLogoBase64 = "";
 let currentClientCompany = "Company"; let currentClientCity = "-"; let currentClientMob = "-";
-const webAppUrl = "https://script.google.com/macros/s/AKfycbxNa51uPFhMwD9Wi6CWbztmQpG5UyHttWjOmhKf-TkHsCmMSmn8wqr8d3Dq_H5ol2o/exec";
+const webAppUrl = "https://script.google.com/macros/s/AKfycbyOfdLblRpwI04yiq2RfzwyVuGDxYmHhAH0eHur69s4cbEgibUgI-SPhNi_yN-wEZGU/exec";
 
 document.getElementById('logoUpload').addEventListener('change', function(e) {
     let file = e.target.files[0]; let reader = new FileReader();
@@ -132,7 +132,7 @@ function generateClient() {
     if(!comp || !name) { alert("Fill all fields"); return; }
     getGPSLocation((geo) => {
         let clientData = { comp: comp, name: name, city: city, mob: mob, desig: desig, logo: uploadedLogoBase64, geo: geo, type: "NEW_CLIENT" };
-        let qrStr = "CLIENT-LOG-" + JSON.stringify({ comp: comp, city: city, mob: mob, logo: uploadedLogoBase64 });
+        let qrStr = "CLIENT-LOG-" + JSON.stringify({ comp: comp, city: city, mob: mob, logo: (uploadedLogoBase64 ? "YES" : "NO") });
         let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrStr)}`;
         document.getElementById("superQrOutput").innerHTML = `<h4>${comp} QR Code</h4><img src="${qrUrl}">`;
         fetch(webAppUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(clientData) });
