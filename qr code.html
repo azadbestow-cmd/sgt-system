@@ -12,7 +12,8 @@
         .phone-container { display: flex; gap: 8px; margin-bottom: 10px; }
         .phone-code { width: 25%; padding: 11px; border: 1px solid #ccc; border-radius: 8px; background: #eee; font-weight: bold; text-align: center; }
         .phone-num { flex: 1; padding: 11px; border: 1px solid #ccc; border-radius: 8px; }
-        button { background-color: #1e3c72; color: white; border: none; padding: 12px; font-size: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
+        button { background-color: #1e3c72; color: white; border: none; padding: 12px; font-size: 14px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
+        .cam-btn { background-color: #17a2b8; margin-bottom: 10px; }
         .panel { display: none; margin-top: 20px; text-align: left; padding: 15px; border: 1px solid #e0e0e0; border-radius: 12px; background: #fafafa; }
         
         /* TWO-SIDED PRINTABLE CR80 ID CARD */
@@ -46,8 +47,10 @@
         .back-desc { font-size: 8px; color: #555; line-height: 1.3; width: 85%; margin-bottom: 8px; }
         .back-footer { font-size: 8px; font-weight: bold; color: #1e3c72; text-transform: uppercase; border-top: 1px solid #ddd; width: 100%; padding-top: 4px; }
 
-        #cameraStream { width: 100%; height: 150px; background: #000; border-radius: 8px; margin-bottom: 10px; display: none; }
+        .video-box { width: 100%; height: 150px; background: #000; border-radius: 8px; margin-bottom: 10px; display: none; object-fit: cover; }
         #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; margin-top: 15px; }
+        .upload-section { background: #edf2f7; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        .upload-section label { font-size: 12px; font-weight: bold; color: #4a5568; display: block; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -67,13 +70,30 @@
         </div>
         <input type="text" id="clientDesig" placeholder="Designation (e.g. Owner)">
         
-        <label style="font-size:12px; font-weight:bold;">Upload Company Logo:</label>
-        <input type="file" id="logoUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:5px;">
+        <div class="upload-section">
+            <label>1. Company Logo:</label>
+            <input type="file" id="logoUpload" accept="image/*" style="border:none; padding:5px;">
+        </div>
+
+        <div class="upload-section">
+            <label>2. Owner Photo:</label>
+            <input type="file" id="ownerPhotoUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:5px;">
+            <button type="button" class="cam-btn" onclick="openCam('owner')">📸 Capture Owner Photo</button>
+            <video id="ownerVideo" class="video-box" autoplay playsinline></video>
+            <button type="button" id="ownerSnapBtn" style="background:#6f42c1; display:none; margin-bottom:5px;" onclick="snapCam('owner')">🎯 Take Photo</button>
+            <input type="hidden" id="ownerCapturedData">
+        </div>
         
-        <label style="font-size:12px; font-weight:bold;">Upload Owner Signature:</label>
-        <input type="file" id="sigUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:10px;">
+        <div class="upload-section">
+            <label>3. Owner Signature:</label>
+            <input type="file" id="sigUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:5px;">
+            <button type="button" class="cam-btn" onclick="openCam('sig')">📸 Capture Signature Paper</button>
+            <video id="sigVideo" class="video-box" autoplay playsinline></video>
+            <button type="button" id="sigSnapBtn" style="background:#6f42c1; display:none;" onclick="snapCam('sig')">🎯 Take Signature Photo</button>
+            <input type="hidden" id="sigCapturedData">
+        </div>
         
-        <button onclick="generateClient()">Create Client & Generate Card</button>
+        <button onclick="generateClient()" style="margin-top:15px; background:#28a745;">Create Client & Generate Card</button>
         <div id="superQrOutput" style="margin-top:15px; text-align:center;"></div>
     </div>
 
@@ -87,17 +107,21 @@
             <option value="Machine Operator">Machine Operator</option>
             <option value="Service Engineer">Service Engineer</option>
         </select>
-        <button type="button" onclick="startCamera()" style="background-color:#17a2b8;">📸 Open Staff Camera</button>
-        <video id="cameraStream" autoplay playsinline></video>
-        <button type="button" id="snapBtn" onclick="takeSnapshot()" style="background-color:#6f42c1; display:none;">🎯 Capture Photo</button>
-        <canvas id="photoCanvas" style="display:none;"></canvas>
-        <input type="hidden" id="capturedPhotoData">
+        
+        <div class="upload-section">
+            <label>Staff Photo:</label>
+            <input type="file" id="staffPhotoUpload" accept="image/*" style="border:none; padding:5px; margin-bottom:5px;">
+            <button type="button" class="cam-btn" onclick="openCam('staff')">📸 Open Staff Camera</button>
+            <video id="staffVideo" class="video-box" autoplay playsinline></video>
+            <button type="button" id="staffSnapBtn" style="background:#6f42c1; display:none;" onclick="snapCam('staff')">🎯 Capture Staff Photo</button>
+            <input type="hidden" id="staffCapturedData">
+        </div>
+        
         <button onclick="createStaffBadge()" style="margin-top:10px;">Generate Staff Smart Badge</button>
     </div>
 
     <div class="badge-wrapper" id="badgeWrapper">
         <div class="cards-print-container">
-            
             <div class="id-card card-front">
                 <div class="front-top-bar">
                     <div id="cardCompName" class="front-comp-title">COMPANY NAME</div>
@@ -139,37 +163,35 @@
                 </div>
                 <div class="back-footer">Powered by Softwire</div>
             </div>
-            
         </div>
-        <button onclick="window.print()" style="background-color:#28a745; margin-top:15px;">🖨️ Download / Print Cards (CR80)</button>
-        <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px; display:none;" onclick="shareOnWhatsApp()">💬 Send Card Info via WhatsApp</button>
+        <button onclick="window.print()" style="background-color:#28a745; margin-top:15px;">🖨 nighttime/ Print Cards (CR80)</button>
+        <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px; display:none;" onclick="shareOnWhatsApp()">💬 Send via WhatsApp</button>
     </div>
+    <canvas id="photoCanvas" style="display:none;"></canvas>
 </div>
 
 <script>
-let html5QrCode; let localStream; let uploadedLogoBase64 = ""; let uploadedSigBase64 = "";
+let html5QrCode; let localStream; 
+let uploadedLogoBase64 = ""; let uploadedOwnerPhotoBase64 = ""; let uploadedSigBase64 = "";
 let currentClientCompany = ""; let currentClientCity = ""; let currentClientMob = ""; let globalSystemUrl = "";
 const systemUrl = "https://azadbestow-cmd.github.io/sgt-system/qr%20code.html";
 const webAppUrl = "https://script.google.com/macros/s/AKfycbxNa51uPFhMwD9Wi6CWbztmQpG5UyHttWjOmhKf-TkHsCmMSmn8wqr8d3Dq_H5ol2o/exec";
 
-document.getElementById('logoUpload').addEventListener('change', function(e) {
-    let file = e.target.files[0]; let reader = new FileReader();
-    reader.onloadend = function() { uploadedLogoBase64 = reader.result; }
-    if (file) reader.readAsDataURL(file);
-});
+// File Conversion Utilities
+document.getElementById('logoUpload').addEventListener('change', function(e) { handleFile(e, data => uploadedLogoBase64 = data); });
+document.getElementById('ownerPhotoUpload').addEventListener('change', function(e) { handleFile(e, data => uploadedOwnerPhotoBase64 = data); });
+document.getElementById('sigUpload').addEventListener('change', function(e) { handleFile(e, data => uploadedSigBase64 = data); });
+document.getElementById('staffPhotoUpload').addEventListener('change', function(e) { handleFile(e, data => document.getElementById('staffCapturedData').value = data); });
 
-document.getElementById('sigUpload').addEventListener('change', function(e) {
+function handleFile(e, callback) {
     let file = e.target.files[0]; let reader = new FileReader();
-    reader.onloadend = function() { uploadedSigBase64 = reader.result; }
-    if (file) reader.readAsDataURL(file);
-});
+    reader.onloadend = function() { callback(reader.result); }; if (file) reader.readAsDataURL(file);
+}
 
 window.addEventListener('DOMContentLoaded', () => {
     html5QrCode = new Html5Qrcode("reader");
     Html5Qrcode.getCameras().then(cameras => {
-        if (cameras && cameras.length > 0) {
-            html5QrCode.start(cameras[cameras.length-1].id, { fps: 10, qrbox: 250 }, onScanSuccess, () => {});
-        }
+        if (cameras && cameras.length > 0) { html5QrCode.start(cameras[cameras.length-1].id, { fps: 10, qrbox: 250 }, onScanSuccess, () => {}); }
     }).catch(() => { document.getElementById("mainSub").innerText = "Camera Permission Required."; });
 });
 
@@ -182,38 +204,55 @@ function onScanSuccess(decodedText) {
         currentClientCompany = data.comp; currentClientCity = data.city; currentClientMob = data.mob;
         document.getElementById("clientAdminPanel").style.display = "block";
         document.getElementById("adminTitle").innerText = data.comp + " Dashboard";
-        if(data.logo && data.logo !== "NO") { 
-            let img = document.getElementById("clientPanelLogo"); img.src = data.logo; img.style.display = "block"; 
-        }
+        if(data.logo && data.logo !== "NO") { let img = document.getElementById("clientPanelLogo"); img.src = data.logo; img.style.display = "block"; }
     }
 }
 
-function getGPSLocation(callback) {
-    navigator.geolocation.getCurrentPosition((pos) => callback(`${pos.coords.latitude},${pos.coords.longitude}`), () => callback("Permission Denied"));
+// Camera controls on same mobile screen
+function openCam(type) {
+    let video = document.getElementById(type + "Video");
+    let btn = document.getElementById(type + "SnapBtn");
+    video.style.display = "block"; btn.style.display = "block";
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: type === 'sig' ? "environment" : "user" } }).then(stream => {
+        localStream = stream; video.srcObject = stream;
+    });
 }
+
+function snapCam(type) {
+    let video = document.getElementById(type + "Video");
+    let canvas = document.getElementById("photoCanvas");
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    let dataUrl = canvas.toDataURL('image/jpeg');
+    
+    if(type === 'owner') uploadedOwnerPhotoBase64 = dataUrl;
+    if(type === 'sig') uploadedSigBase64 = dataUrl;
+    if(type === 'staff') document.getElementById("staffCapturedData").value = dataUrl;
+    
+    localStream.getTracks().forEach(track => track.stop());
+    video.style.display = "none"; document.getElementById(type + "SnapBtn").style.display = "none";
+}
+
+function getGPSLocation(callback) { navigator.geolocation.getCurrentPosition((pos) => callback(`${pos.coords.latitude},${pos.coords.longitude}`), () => callback("Permission Denied")); }
 
 function generateClient() {
     let comp = document.getElementById("compName").value; let name = document.getElementById("clientName").value;
     let city = document.getElementById("clientCity").value; let fullMobile = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
     let desig = document.getElementById("clientDesig").value || "Owner";
-    if(!comp || !name) { alert("Fill required fields!"); return; }
+    if(!comp || !name) { alert("Fill fields!"); return; }
     
     getGPSLocation((geo) => {
-        // Front QR String (Scans for dynamic action when app is running)
         let frontToken = `FRONT-VERIFY-${comp}-${Math.floor(1000+Math.random()*9000)}`;
         let frontQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(frontToken)}`;
-        
-        // Back QR String (Opens GitHub Deployment Link)
         let backQrString = "CLIENT-LOG-" + JSON.stringify({ comp: comp, city: city, mob: fullMobile, logo: (uploadedLogoBase64 ? "YES" : "NO") });
         let backQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(backQrString)}`;
         globalSystemUrl = backQrUrl;
 
-        // Render Cards Info
         document.getElementById("cardCompName").innerText = comp.toUpperCase();
         document.getElementById("cardHeaderLogo").src = uploadedLogoBase64 || "https://via.placeholder.com/65x22?text=LOGO";
         document.getElementById("cardHolderName").innerText = name; document.getElementById("cardHolderRole").innerText = desig;
         document.getElementById("cardHolderCity").innerText = city; document.getElementById("cardHolderMob").innerText = fullMobile;
-        document.getElementById("cardPhotoImg").src = uploadedLogoBase64 || "https://via.placeholder.com/75x85?text=Owner+Photo";
+        document.getElementById("cardPhotoImg").src = uploadedOwnerPhotoBase64 || "https://via.placeholder.com/75x85?text=Owner";
         
         document.getElementById("frontQrContainer").innerHTML = `<img src="${frontQrUrl}">`;
         document.getElementById("backQrContainer").innerHTML = `<img src="${backQrUrl}">`;
@@ -231,23 +270,10 @@ function generateClient() {
     });
 }
 
-function startCamera() {
-    document.getElementById("cameraStream").style.display = "block"; document.getElementById("snapBtn").style.display = "block";
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => { localStream = stream; document.getElementById("cameraStream").srcObject = stream; });
-}
-
-function takeSnapshot() {
-    let video = document.getElementById("cameraStream"); let canvas = document.getElementById("photoCanvas");
-    canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0);
-    let dataUrl = canvas.toDataURL('image/jpeg');
-    document.getElementById("capturedPhotoData").value = dataUrl; document.getElementById("cardPhotoImg").src = dataUrl;
-    localStream.getTracks().forEach(track => track.stop()); video.style.display = "none"; document.getElementById("snapBtn").style.display = "none";
-}
-
 function createStaffBadge() {
-    let name = document.getElementById("staffName").value; let desig = document.getElementById("staffDesig").value; let photo = document.getElementById("capturedPhotoData").value;
-    if(!name || !photo) { alert("Enter name and capture photo"); return; }
-    let t = new Date(); let issue = t.getDate() + '/' + (t.getMonth()+1) + '/' + t.getFullYear(); let expiry = t.getDate() + '/' + (t.getMonth()+1) + '/' + (t.getFullYear()+1);
+    let name = document.getElementById("staffName").value; let desig = document.getElementById("staffDesig").value;
+    let photo = document.getElementById("staffCapturedData").value;
+    if(!name || !photo) { alert("Photo and Name required!"); return; }
     
     document.getElementById("cardCompName").innerText = currentClientCompany.toUpperCase();
     document.getElementById("cardHolderName").innerText = name; document.getElementById("cardHolderRole").innerText = desig;
@@ -255,9 +281,9 @@ function createStaffBadge() {
     document.getElementById("cardPhotoImg").src = photo;
     
     let staffFrontToken = `STAFF-FRONT-${name}-${Math.floor(1000+Math.random()*9000)}`;
-    let staffFrontQr = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(staffFrontToken)}`;
-    document.getElementById("frontQrContainer").innerHTML = `<img src="${staffFrontQr}">`;
+    document.getElementById("frontQrContainer").innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(staffFrontToken)}">`;
     document.getElementById("backQrContainer").innerHTML = `<img src="${globalSystemUrl || 'STAFF-BACK-LINK'}">`;
+    if(uploadedSigBase64) { document.getElementById("cardSigContainer").innerHTML = `<img src="${uploadedSigBase64}">`; }
     
     document.getElementById("badgeWrapper").style.display = "block";
     getGPSLocation((geo) => {
@@ -268,9 +294,7 @@ function createStaffBadge() {
 
 function shareOnWhatsApp() {
     let mob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
-    let comp = document.getElementById("compName").value;
-    let msg = `Hello Admin, Your system card for ${comp} has been generated. Scan back QR to open system. Link: ${systemUrl}`;
-    window.open(`https://wa.me/${mob.replace('+', '')}?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://wa.me/${mob.replace('+', '')}?text=System Card Generated. Link: ${systemUrl}`, '_blank');
 }
 </script>
 </body>
