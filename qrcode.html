@@ -27,7 +27,7 @@
         .badge-wrapper { display: none; margin-top: 25px; }
         .a4-container-frame { width: 595px !important; height: 842px !important; background: #ffffff !important; margin: 20px auto; padding: 40px; box-sizing: border-box; border: 1px solid #ccc; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 40px; position: relative; }
         
-        /* 🪪 EXACT PVC CARD HARDWARE BLOCK DIMENSIONS SEALED */
+        /* 🪪 RE-PROPORTIONED PREMIUM CARD LOCK WITH LARGE LOGO AREA */
         .id-card { width: 324px !important; height: 204px !important; background: #ffffff !important; border-radius: 12px; box-sizing: border-box; position: relative; overflow: hidden; border: 1.5px solid #222222; text-align: left; }
         .card-front { padding: 12px 12px 12px 22px; }
         .card-front::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: linear-gradient(to bottom, #1e3c72, #2a5298); }
@@ -213,7 +213,7 @@
         <div>
             <button onclick="downloadCardAsImage()" style="background-color:#ff9800; margin-top:20px;">📥 SAVE A4 SHEET TO GALLERY</button>
             <button onclick="downloadDirectPDF()" style="background-color:#28a745; margin-top:5px;">🖨️ DOWNLOAD DIRECT A4 PDF</button>
-            <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px;" onclick="shareOnWhatsApp()">💬 Send Card Info via WhatsApp</button>
+            <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px;" onclick="processWhatsAppWithAutoDownload()">💬 Send Card Info via WhatsApp</button>
         </div>
     </div>
     <canvas id="photoCanvas" style="display:none;"></canvas>
@@ -352,10 +352,6 @@ function generateClient() {
         document.getElementById("backQrContainer").innerHTML = `<img src="${backQrUrl}">`;
         if(uploadedSigBase64) { document.getElementById("cardSigContainer").innerHTML = `<img src="${uploadedSigBase64}">`; }
         
-        let t = new Date();
-        document.getElementById("cardIssueDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + t.getFullYear();
-        document.getElementById("cardExpiryDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + (t.getFullYear()+1);
-        
         document.getElementById("whatsappShareBtn").style.display = "block";
         document.getElementById("badgeWrapper").style.display = "block";
         
@@ -407,6 +403,21 @@ function downloadDirectPDF() {
     });
 }
 
+// 🚀 AUTOMATIC DOUBLE-ACTION FLOW FOR ZERO-FRICTION CLIENT EXP
+function processWhatsAppWithAutoDownload() {
+    let target = document.getElementById("printableCardsArea");
+    // Action 1: Force background download of the image sheet immediately
+    html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 595, height: 842 }).then(canvas => {
+        let link = document.createElement("a");
+        link.download = (document.getElementById("cardHolderName").innerText || "SGT_Card") + "_A4_Sheet.png";
+        link.href = canvas.toDataURL("image/png"); 
+        link.click();
+        
+        // Action 2: Trigger WhatsApp text stream natively right after file lands in phone gallery
+        setTimeout(shareOnWhatsApp, 800); 
+    });
+}
+
 function shareOnWhatsApp() {
     let rawMob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
     let cleanMob = rawMob.replace(/[^0-9]/g, "");
@@ -414,7 +425,7 @@ function shareOnWhatsApp() {
     let name = document.getElementById("cardHolderName").innerText;
     let desig = document.getElementById("cardHolderRole").innerText;
     
-    let msg = `*SGT SECURE SYSTEM ACCESS*\n\n*Company:* ${comp}\n*Name:* ${name}\n*Designation:* ${desig}\n\nYour System Profile link has been generated successfully. Click here to open dashboard:\n🔗 ${systemUrl}\n\n_(Note: Attached card sheet image is listed below)_`;
+    let msg = `*SGT SECURE SYSTEM ACCESS*\n\n*Company:* ${comp}\n*Name:* ${name}\n*Designation:* ${desig}\n\nYour System Profile link has been generated successfully. Click here to open dashboard:\n🔗 ${systemUrl}\n\n_(Note: Select and attach the newly downloaded A4 sheet image from your gallery now)_`;
     window.open(`https://wa.me/${cleanMob}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 </script>
