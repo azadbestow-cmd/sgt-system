@@ -12,9 +12,11 @@
         .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0px 10px 30px rgba(0,0,0,0.06); }
         h2 { color: #1e3c72; font-size: 22px; margin-top: 0; margin-bottom: 20px; font-weight: 800; }
         input, select { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 12px; border: 1px solid #ced4da; border-radius: 10px; font-size: 14px; }
-        .phone-container { display: flex; gap: 8px; margin-bottom: 12px; }
+        .phone-container { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+        .phone-input-row { display: flex; gap: 8px; }
         .phone-code { width: 25%; padding: 12px; border: 1px solid #ced4da; border-radius: 10px; background: #e9ecef; font-weight: bold; text-align: center; }
         .phone-num { flex: 1; padding: 12px; border: 1px solid #ced4da; border-radius: 10px; }
+        .contact-btn { background-color: #ffc107; color: #212529; font-size: 12px; padding: 8px; border-radius: 8px; font-weight: bold; margin-bottom: 5px; text-transform: none; }
         button { background-color: #1e3c72; color: white; border: none; padding: 12px; font-size: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
         .cam-btn { background-color: #00b4d8; margin-bottom: 8px; }
         .stop-btn { background-color: #dc3545; margin-bottom: 8px; display: none; }
@@ -22,44 +24,21 @@
         .upload-section { background: #ffffff; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #e3e8ee; }
         .upload-section label { font-size: 12px; font-weight: 700; color: #495057; display: block; margin-bottom: 6px; }
         
-        /* 🖨️ FIXED RELIABLE A4 STRUCTURAL CONTAINER FOR PRINT & EXPORT */
         .badge-wrapper { display: none; margin-top: 25px; }
+        .a4-container-frame { width: 595px !important; height: 842px !important; background: #ffffff !important; margin: 20px auto; padding: 40px; box-sizing: border-box; border: 1px solid #ccc; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 40px; position: relative; }
         
-        .a4-container-frame { 
-            width: 595px !important; 
-            height: 842px !important; 
-            background: #ffffff !important; 
-            margin: 20px auto; 
-            padding: 50px; 
-            box-sizing: border-box; 
-            border: 1px solid #ccc; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: flex-start; 
-            gap: 40px; 
-            position: relative;
-        }
-
-        /* HARD CR80 PLASTIC CARD PRINT LOCK (85.6mm x 54mm) */
-        .id-card { 
-            width: 324px !important; 
-            height: 204px !important; 
-            background: #ffffff !important; 
-            border-radius: 12px; 
-            box-sizing: border-box; 
-            position: relative; 
-            overflow: hidden; 
-            border: 1.5px solid #222222; 
-            text-align: left; 
-        }
-        
+        /* 🪪 RE-PROPORTIONED PREMIUM CARD LOCK WITH LARGE LOGO AREA */
+        .id-card { width: 324px !important; height: 204px !important; background: #ffffff !important; border-radius: 12px; box-sizing: border-box; position: relative; overflow: hidden; border: 1.5px solid #222222; text-align: left; }
         .card-front { padding: 12px 12px 12px 22px; }
         .card-front::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: linear-gradient(to bottom, #1e3c72, #2a5298); }
-        .front-top-bar { display: flex; justify-content: space-between; align-items: start; margin-bottom: 2px; }
-        .front-comp-title { font-size: 13px; font-weight: 800; color: #1e3c72; text-transform: uppercase; }
-        .front-comp-slogan { font-size: 7px; font-weight: 600; color: #6c757d; text-transform: uppercase; margin-top: -2px; }
-        .front-comp-logo { max-height: 22px; max-width: 65px; object-fit: contain; border-radius: 2px; }
+        
+        .front-top-bar { display: flex; justify-content: space-between; align-items: start; margin-bottom: 2px; gap: 5px; }
+        .front-comp-title { font-size: 13px; font-weight: 800; color: #1e3c72; text-transform: uppercase; max-width: 180px; word-wrap: break-word; }
+        .front-comp-slogan { font-size: 7px; font-weight: 600; color: #6c757d; text-transform: uppercase; margin-top: -2px; max-width: 180px; }
+        
+        /* 🏢 LOGO SIZE ACCURATELY ENLARGED FOR HIGH VISIBILITY */
+        .front-comp-logo { max-height: 35px !important; max-width: 110px !important; width: auto; height: auto; object-fit: contain; border-radius: 2px; }
+        
         .front-sub-tag { font-size: 7px; font-weight: 700; color: #fff; background: #1e3c72; padding: 1px 6px; border-radius: 10px; display: inline-block; margin-top: 1px; text-transform: uppercase; }
         .front-main-body { display: flex; gap: 10px; margin-top: 8px; align-items: center; }
         .front-photo-frame { width: 72px; height: 82px; background: #f8f9fa; border-radius: 6px; overflow: hidden; border: 1.5px solid #1e3c72; }
@@ -105,8 +84,11 @@
         <input type="text" id="clientCity" placeholder="City">
         
         <div class="phone-container">
-            <input type="text" id="phoneCode" class="phone-code" value="+92">
-            <input type="text" id="clientMobile" class="phone-num" placeholder="0300 7654321 or +92300...">
+            <button type="button" class="contact-btn" id="selectContactBtn" onclick="getMobileContact()">👤 Select From Contacts</button>
+            <div class="phone-input-row">
+                <input type="text" id="phoneCode" class="phone-code" value="+92">
+                <input type="text" id="clientMobile" class="phone-num" placeholder="3007654321">
+            </div>
         </div>
 
         <select id="clientDesig">
@@ -242,7 +224,7 @@ let currentClientCompany = ""; let currentClientCity = ""; let currentClientMob 
 let currentClientSlogan = "";
 
 const systemUrl = "https://azadbestow-cmd.github.io/sgt-system/qrcode.html";
-const webAppUrl = "https://script.google.com/macros/s/AKfycbxN_qFcMTHfzRj3n-_LrYPwjhLHDfryykPLohuUU8csjNCyq1gF0FhjWNea22qC-v-uMQ/exec";
+const webAppUrl = "https://script.google.com/macros/s/AKfycbxLe6_7rcoYqD8p8B9Wz31wG08o-K8o_yS9g-MTHsC_jNC_q7fG0F_jN_e2_qC_v-u_MQ/exec";
 
 document.getElementById('logoUpload').addEventListener('change', function(e) { handleFile(e, data => uploadedLogoBase64 = data); });
 document.getElementById('ownerPhotoUpload').addEventListener('change', function(e) { handleFile(e, data => uploadedOwnerPhotoBase64 = data); });
@@ -258,6 +240,11 @@ window.addEventListener('DOMContentLoaded', () => {
     Html5Qrcode.getCameras().then(cameras => {
         if (cameras && cameras.length > 0) { html5QrCode.start(cameras[cameras.length-1].id, { fps: 10, qrbox: 250 }, onScanSuccess, () => {}); }
     }).catch(() => { document.getElementById("mainSub").innerText = "Camera Required."; });
+    
+    // Hide Contact Button if browser does not support Native Contact Picker API
+    if (!('contacts' in navigator && 'ContactsManager' in window)) {
+        document.getElementById('selectContactBtn').style.display = 'none';
+    }
 });
 
 function onScanSuccess(decodedText) {
@@ -270,6 +257,31 @@ function onScanSuccess(decodedText) {
         document.getElementById("clientAdminPanel").style.display = "block";
         document.getElementById("adminTitle").innerText = data.comp + " Dashboard";
         if(data.logo && data.logo !== "NO") { let img = document.getElementById("clientPanelLogo"); img.src = data.logo; img.style.display = "block"; }
+    }
+}
+
+// 👤 NATIVE CONTACT PICKER ENGINE — AUTO FORMATTING INCLUDED
+async function getMobileContact() {
+    const props = ['tel'];
+    try {
+        const contacts = await navigator.contacts.select(props, { multiple: false });
+        if (contacts.length && contacts[0].tel && contacts[0].tel.length) {
+            let rawNumber = contacts[0].tel[0];
+            
+            // Auto strip non-numeric parameters to enforce clean string
+            let sanitized = rawNumber.replace(/[^0-9+]/g, "");
+            if(sanitized.startsWith("+")) {
+                document.getElementById("phoneCode").value = "+92";
+                document.getElementById("clientMobile").value = sanitized.replace("+92", "").replace("+", "");
+            } else if(sanitized.startsWith("03")) {
+                document.getElementById("phoneCode").value = "+92";
+                document.getElementById("clientMobile").value = sanitized.substring(1);
+            } else {
+                document.getElementById("clientMobile").value = sanitized;
+            }
+        }
+    } catch (ex) {
+        console.log("Contact Picker cancelled or not supported.");
     }
 }
 
@@ -294,7 +306,7 @@ function openCam(type) {
     navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: type === 'sig' ? "environment" : "user" } 
     }).then(stream => { localStream = stream; video.srcObject = stream; })
-      .catch(err => { alert("Camera initialization failed. Check permissions."); });
+      .catch(err => { alert("Camera initialization failed."); });
 }
 
 function snapCam(type) {
@@ -341,10 +353,6 @@ function generateClient() {
         document.getElementById("frontQrContainer").innerHTML = `<img src="${frontQrUrl}">`;
         document.getElementById("backQrContainer").innerHTML = `<img src="${backQrUrl}">`;
         if(uploadedSigBase64) { document.getElementById("cardSigContainer").innerHTML = `<img src="${uploadedSigBase64}">`; }
-        
-        let t = new Date();
-        document.getElementById("cardIssueDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + t.getFullYear();
-        document.getElementById("cardExpiryDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + (t.getFullYear()+1);
         
         document.getElementById("whatsappShareBtn").style.display = "block";
         document.getElementById("badgeWrapper").style.display = "block";
