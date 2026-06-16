@@ -4,19 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Softwire Enterprise Identity System</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SGT Admin">
+    <meta name="mobile-web-app-capable" content="yes">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; background-color: #f4f6f9; padding: 15px; margin: 0; color: #333; }
-        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0px 10px 30px rgba(0,0,0,0.06); }
+        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0px 10px 30px rgba(0,0,0,0.06); position: relative; }
+        
+        /* 📊 SUPER-ADMIN DASHBOARD SWITCH NAVIGATION BUTTON */
+        .nav-dash-btn { background: linear-gradient(135deg, #00b4d8, #0077b6); color: white; padding: 10px; font-size: 12px; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-block; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; border: none; width: 100%; box-sizing: border-box; cursor: pointer; }
+        
         h2 { color: #1e3c72; font-size: 22px; margin-top: 0; margin-bottom: 20px; font-weight: 800; }
         input, select { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 12px; border: 1px solid #ced4da; border-radius: 10px; font-size: 14px; }
         .phone-container { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
         .phone-input-row { display: flex; gap: 8px; }
         .phone-code { width: 25%; padding: 12px; border: 1px solid #ced4da; border-radius: 10px; background: #e9ecef; font-weight: bold; text-align: center; }
         .phone-num { flex: 1; padding: 12px; border: 1px solid #ced4da; border-radius: 10px; }
-        .contact-btn { background-color: #ffc107; color: #212529; font-size: 12px; padding: 8px; border-radius: 8px; font-weight: bold; margin-bottom: 5px; text-transform: none; }
+        .contact-btn { background-color: #ffc107; color: #212529; font-size: 12px; padding: 8px; border-radius: 8px; font-weight: bold; margin-bottom: 5px; text-transform: none; border: none; cursor: pointer; }
         button { background-color: #1e3c72; color: white; border: none; padding: 12px; font-size: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
         .cam-btn { background-color: #00b4d8; margin-bottom: 8px; }
         .stop-btn { background-color: #dc3545; margin-bottom: 8px; display: none; }
@@ -27,7 +38,6 @@
         .badge-wrapper { display: none; margin-top: 25px; }
         .a4-container-frame { width: 595px !important; height: 842px !important; background: #ffffff !important; margin: 20px auto; padding: 40px; box-sizing: border-box; border: 1px solid #ccc; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 40px; position: relative; }
         
-        /* 🪪 RE-PROPORTIONED PREMIUM CARD LOCK WITH LARGE LOGO AREA */
         .id-card { width: 324px !important; height: 204px !important; background: #ffffff !important; border-radius: 12px; box-sizing: border-box; position: relative; overflow: hidden; border: 1.5px solid #222222; text-align: left; }
         .card-front { padding: 12px 12px 12px 22px; }
         .card-front::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: linear-gradient(to bottom, #1e3c72, #2a5298); }
@@ -70,10 +80,11 @@
 </head>
 <body>
 <div class="container">
+    <a href="super-dashboard.html" class="nav-dash-btn">📊 GO TO SUPER-ADMIN DASHBOARD</a>
+
     <h2>SOFTWIRE ID MANAGER</h2>
     <div id="reader"></div>
 
-    <!-- 👑 SUPER-ADMIN PANEL -->
     <div class="panel" id="superAdminPanel">
         <h3 style="color: #1e3c72; margin: 0 0 15px 0;">👑 Super-Admin Panel</h3>
         <input type="text" id="compName" placeholder="Company Name (e.g., SE Group)">
@@ -127,7 +138,6 @@
         <button onclick="generateClient()" style="margin-top:15px; background:#28a745; padding: 14px;">Create Client & Generate Beautiful Card</button>
     </div>
 
-    <!-- 👥 CLIENT DASHBOARD -->
     <div class="panel" id="clientAdminPanel">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
             <img id="clientPanelLogo" src="" style="max-height:40px; display:none; border-radius:4px;">
@@ -155,7 +165,6 @@
         <button onclick="createStaffBadge()" style="margin-top:10px;">Generate Staff Smart Badge</button>
     </div>
 
-    <!-- 🪪 TWO-SIDED CARD LAYER -->
     <div class="badge-wrapper" id="badgeWrapper">
         <div class="scroll-wrapper">
             <div class="a4-container-frame" id="printableCardsArea">
@@ -163,7 +172,6 @@
                     SOFTWIRE PRINT SYSTEM — STANDARD A4 LAYOUT SHEET
                 </div>
 
-                <!-- FRONT SIDE -->
                 <div class="id-card card-front">
                     <div class="front-top-bar">
                         <div>
@@ -195,7 +203,6 @@
                     </div>
                 </div>
 
-                <!-- BACK SIDE -->
                 <div class="id-card card-back">
                     <div class="back-title">System Access Card</div>
                     <div id="backQrContainer" class="back-qr-box"></div>
@@ -241,10 +248,15 @@ window.addEventListener('DOMContentLoaded', () => {
     html5QrCode = new Html5Qrcode("reader");
     Html5Qrcode.getCameras().then(cameras => {
         if (cameras && cameras.length > 0) { html5QrCode.start(cameras[cameras.length-1].id, { fps: 10, qrbox: 250 }, onScanSuccess, () => {}); }
-    }).catch(() => { console.log("Camera initialization interface standard."); });
+    }).catch(() => { console.log("Interface system active."); });
     
     if (!('contacts' in navigator && 'ContactsManager' in window)) {
         document.getElementById('selectContactBtn').style.display = 'none';
+    }
+    
+    // 📱 JOTFORM STYLE PWA APPLICATION INTERFACE LINK CODES
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('data:text/javascript;base64,Y29uc29sZS5sb2coJ1NWTGl2ZScpOw==');
     }
 });
 
@@ -279,7 +291,7 @@ async function getMobileContact() {
             }
         }
     } catch (ex) {
-        console.log("Contact Picker native support log.");
+        console.log("Contact Picker native profile.");
     }
 }
 
@@ -337,7 +349,9 @@ function generateClient() {
     getGPSLocation((geo) => {
         let frontToken = `FRONT-VERIFY-${comp}-${Math.floor(1000+Math.random()*9000)}`;
         let frontQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(frontToken)}`;
-        let backQrString = "CLIENT-LOG-" + JSON.stringify({ comp: comp, city: city, mob: fullMobile, slogan: slogan, logo: (uploadedLogoBase64 ? "YES" : "NO") });
+        
+        // 🔐 SECURE TOKEN VERIFICATION MAPPING SECURED INSIDE SCAN STRING
+        let backQrString = "CLIENT-LOG-" + JSON.stringify({ comp: comp, city: city, mob: fullMobile, slogan: slogan, logo: (uploadedLogoBase64 ? "YES" : "NO"), token: frontToken });
         let backQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(backQrString)}`;
         globalSystemUrl = backQrUrl;
 
@@ -351,6 +365,10 @@ function generateClient() {
         document.getElementById("frontQrContainer").innerHTML = `<img src="${frontQrUrl}">`;
         document.getElementById("backQrContainer").innerHTML = `<img src="${backQrUrl}">`;
         if(uploadedSigBase64) { document.getElementById("cardSigContainer").innerHTML = `<img src="${uploadedSigBase64}">`; }
+        
+        let t = new Date();
+        document.getElementById("cardIssueDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + t.getFullYear();
+        document.getElementById("cardExpiryDate").innerText = t.getDate() + '/' + (t.getMonth()+1) + '/' + (t.getFullYear()+1);
         
         document.getElementById("whatsappShareBtn").style.display = "block";
         document.getElementById("badgeWrapper").style.display = "block";
@@ -403,17 +421,13 @@ function downloadDirectPDF() {
     });
 }
 
-// 🚀 AUTOMATIC DOUBLE-ACTION FLOW FOR ZERO-FRICTION CLIENT EXP
 function processWhatsAppWithAutoDownload() {
     let target = document.getElementById("printableCardsArea");
-    // Action 1: Force background download of the image sheet immediately
     html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 595, height: 842 }).then(canvas => {
         let link = document.createElement("a");
         link.download = (document.getElementById("cardHolderName").innerText || "SGT_Card") + "_A4_Sheet.png";
         link.href = canvas.toDataURL("image/png"); 
         link.click();
-        
-        // Action 2: Trigger WhatsApp text stream natively right after file lands in phone gallery
         setTimeout(shareOnWhatsApp, 800); 
     });
 }
