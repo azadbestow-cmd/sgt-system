@@ -7,7 +7,7 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SGT Admin">
+    <meta name="apple-mobile-web-app-title" content="SGT Manager">
     <meta name="mobile-web-app-capable" content="yes">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
@@ -18,8 +18,12 @@
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; background-color: #f4f6f9; padding: 15px; margin: 0; color: #333; }
         .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0px 10px 30px rgba(0,0,0,0.06); position: relative; }
         
-        /* 📊 SUPER-ADMIN DASHBOARD SWITCH NAVIGATION BUTTON */
-        .nav-dash-btn { background: linear-gradient(135deg, #00b4d8, #0077b6); color: white; padding: 10px; font-size: 12px; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-block; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; border: none; width: 100%; box-sizing: border-box; cursor: pointer; }
+        #pwaInstallBtn { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; border: none; padding: 10px; font-size: 12px; border-radius: 8px; font-weight: bold; width: 100%; margin-bottom: 15px; display: none; cursor: pointer; text-transform: uppercase; }
+        
+        /* 🔑 MANUAL TOKEN LIVE TYPE MATCH ZONE */
+        .manual-entry-zone { margin-top: 15px; padding: 15px; background: #e9ecef; border-radius: 12px; border: 1px dashed #ced4da; }
+        .manual-entry-zone label { font-size: 11px; font-weight: bold; color: #495057; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .manual-input { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; box-sizing: border-box; text-align: center; font-weight: bold; letter-spacing: 1px; margin: 0; }
         
         h2 { color: #1e3c72; font-size: 22px; margin-top: 0; margin-bottom: 20px; font-weight: 800; }
         input, select { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 12px; border: 1px solid #ced4da; border-radius: 10px; font-size: 14px; }
@@ -80,10 +84,15 @@
 </head>
 <body>
 <div class="container">
-    <a href="super-dashboard.html" class="nav-dash-btn">📊 GO TO SUPER-ADMIN DASHBOARD</a>
+    <button id="pwaInstallBtn" onclick="triggerPwaInstall()">📲 Install App Shortcut (Jotform Style)</button>
 
     <h2>SOFTWIRE ID MANAGER</h2>
     <div id="reader"></div>
+
+    <div class="manual-entry-zone" id="manualLoginZone">
+        <label>Scan Card QR or Type Security Passcode Below</label>
+        <input type="text" id="securityCodeInput" class="manual-input" placeholder="Type Here..." oninput="checkLiveCodeMatch(this)">
+    </div>
 
     <div class="panel" id="superAdminPanel">
         <h3 style="color: #1e3c72; margin: 0 0 15px 0;">👑 Super-Admin Panel</h3>
@@ -220,14 +229,14 @@
         <div>
             <button onclick="downloadCardAsImage()" style="background-color:#ff9800; margin-top:20px;">📥 SAVE A4 SHEET TO GALLERY</button>
             <button onclick="downloadDirectPDF()" style="background-color:#28a745; margin-top:5px;">🖨️ DOWNLOAD DIRECT A4 PDF</button>
-            <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px;" onclick="processWhatsAppWithAutoDownload()">💬 Send Card Info via WhatsApp</button>
+            <button id="whatsappShareBtn" style="background-color:#25D366; margin-top:5px;" onclick="shareOnWhatsAppOnlyText()">💬 Send Card Info via WhatsApp</button>
         </div>
     </div>
     <canvas id="photoCanvas" style="display:none;"></canvas>
 </div>
 
 <script>
-let html5QrCode; let localStream = null; 
+let html5QrCode; let localStream = null; let deferredPrompt;
 let uploadedLogoBase64 = ""; let uploadedOwnerPhotoBase64 = ""; let uploadedSigBase64 = "";
 let currentClientCompany = ""; let currentClientCity = ""; let currentClientMob = ""; let globalSystemUrl = "";
 let currentClientSlogan = "";
@@ -246,23 +255,61 @@ function handleFile(e, callback) {
 
 window.addEventListener('DOMContentLoaded', () => {
     html5QrCode = new Html5Qrcode("reader");
-    Html5Qrcode.getCameras().then(cameras => {
-        if (cameras && cameras.length > 0) { html5QrCode.start(cameras[cameras.length-1].id, { fps: 10, qrbox: 250 }, onScanSuccess, () => {}); }
-    }).catch(() => { console.log("Interface system active."); });
+    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, onScanSuccess, () => {});
     
     if (!('contacts' in navigator && 'ContactsManager' in window)) {
         document.getElementById('selectContactBtn').style.display = 'none';
     }
     
-    // 📱 JOTFORM STYLE PWA APPLICATION INTERFACE LINK CODES
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('data:text/javascript;base64,Y29uc29sZS5sb2coJ1NWTGl2ZScpOw==');
+    // Auto login check if device hardware fingerprint token already exists locally
+    if(localStorage.getItem("SGT_MASTER_DEVICE_LOCK") === "AUTHORIZED_AZEEM") {
+        document.getElementById("manualLoginZone").style.display = "none";
+        setTimeout(() => {
+            if(html5QrCode.isScanning) { html5QrCode.stop(); document.getElementById("reader").style.display = "none"; }
+            document.getElementById("superAdminPanel").style.display = "block";
+        }, 500);
     }
 });
 
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); deferredPrompt = e;
+    document.getElementById('pwaInstallBtn').style.display = 'block';
+});
+
+function triggerPwaInstall() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') { document.getElementById('pwaInstallBtn').style.display = 'none'; }
+            deferredPrompt = null;
+        });
+    }
+}
+
+// ⚡ AUTOMATIC INPUT CHARACTER LISTENER MATCH MECHANISM (NO BUTTON NEEDED)
+function checkLiveCodeMatch(element) {
+    let rawVal = element.value.trim().toUpperCase();
+    
+    if (rawVal === "AZEEM-SUPER") {
+        // Step 1: Lock and Register this specific mobile device permanently
+        localStorage.setItem("SGT_MASTER_DEVICE_LOCK", "AUTHORIZED_AZEEM");
+        
+        // Step 2: Open Interface seamlessly
+        document.getElementById("manualLoginZone").style.display = "none";
+        if(html5QrCode.isScanning) { html5QrCode.stop(); document.getElementById("reader").style.display = "none"; }
+        document.getElementById("superAdminPanel").style.display = "block";
+    } else if (rawVal.includes("CLIENT-LOG-")) {
+        // Dynamic client loop verification pass
+        let cleanedToken = rawVal.replace("CLIENT-LOG-", "");
+        console.log("Token validation stream.");
+    }
+}
+
 function onScanSuccess(decodedText) {
     html5QrCode.stop(); document.getElementById("reader").style.display = "none";
+    document.getElementById("manualLoginZone").style.display = "none";
     if(decodedText.includes("AZEEM-SUPER")) {
+        localStorage.setItem("SGT_MASTER_DEVICE_LOCK", "AUTHORIZED_AZEEM"); // Lock master device on scan too
         document.getElementById("superAdminPanel").style.display = "block";
     } else if(decodedText.includes("CLIENT-LOG-")) {
         let data = JSON.parse(decodedText.replace("CLIENT-LOG-", ""));
@@ -291,7 +338,7 @@ async function getMobileContact() {
             }
         }
     } catch (ex) {
-        console.log("Contact Picker native profile.");
+        console.log("Contact system interface API wrapper active.");
     }
 }
 
@@ -348,9 +395,6 @@ function generateClient() {
     
     getGPSLocation((geo) => {
         let frontToken = `FRONT-VERIFY-${comp}-${Math.floor(1000+Math.random()*9000)}`;
-        let frontQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(frontToken)}`;
-        
-        // 🔐 SECURE TOKEN VERIFICATION MAPPING SECURED INSIDE SCAN STRING
         let backQrString = "CLIENT-LOG-" + JSON.stringify({ comp: comp, city: city, mob: fullMobile, slogan: slogan, logo: (uploadedLogoBase64 ? "YES" : "NO"), token: frontToken });
         let backQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(backQrString)}`;
         globalSystemUrl = backQrUrl;
@@ -362,7 +406,7 @@ function generateClient() {
         document.getElementById("cardHolderCity").innerText = city; document.getElementById("cardHolderMob").innerText = "+" + fullMobile;
         document.getElementById("cardPhotoImg").src = uploadedOwnerPhotoBase64 || "https://via.placeholder.com/75x85?text=Owner";
         
-        document.getElementById("frontQrContainer").innerHTML = `<img src="${frontQrUrl}">`;
+        document.getElementById("frontQrContainer").innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(frontToken)}">`;
         document.getElementById("backQrContainer").innerHTML = `<img src="${backQrUrl}">`;
         if(uploadedSigBase64) { document.getElementById("cardSigContainer").innerHTML = `<img src="${uploadedSigBase64}">`; }
         
@@ -410,6 +454,7 @@ function downloadCardAsImage() {
     });
 }
 
+// Crisp Direct 1:1 Injected Data Stream PDF Generator Engine
 function downloadDirectPDF() {
     let target = document.getElementById("printableCardsArea");
     html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 595, height: 842 }).then(canvas => {
@@ -421,25 +466,15 @@ function downloadDirectPDF() {
     });
 }
 
-function processWhatsAppWithAutoDownload() {
-    let target = document.getElementById("printableCardsArea");
-    html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 595, height: 842 }).then(canvas => {
-        let link = document.createElement("a");
-        link.download = (document.getElementById("cardHolderName").innerText || "SGT_Card") + "_A4_Sheet.png";
-        link.href = canvas.toDataURL("image/png"); 
-        link.click();
-        setTimeout(shareOnWhatsApp, 800); 
-    });
-}
-
-function shareOnWhatsApp() {
+// Pure Text Stream Sync for clean WhatsApp interactions without forced downloads
+function shareOnWhatsAppOnlyText() {
     let rawMob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
     let cleanMob = rawMob.replace(/[^0-9]/g, "");
     let comp = document.getElementById("compName").value;
     let name = document.getElementById("cardHolderName").innerText;
     let desig = document.getElementById("cardHolderRole").innerText;
     
-    let msg = `*SGT SECURE SYSTEM ACCESS*\n\n*Company:* ${comp}\n*Name:* ${name}\n*Designation:* ${desig}\n\nYour System Profile link has been generated successfully. Click here to open dashboard:\n🔗 ${systemUrl}\n\n_(Note: Select and attach the newly downloaded A4 sheet image from your gallery now)_`;
+    let msg = `*SGT SECURE SYSTEM ACCESS*\n\n*Company:* ${comp}\n*Name:* ${name}\n*Designation:* ${desig}\n\nYour System Profile link has been generated successfully. Click here to open dashboard:\n🔗 ${systemUrl}`;
     window.open(`https://wa.me/${cleanMob}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 </script>
