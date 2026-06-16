@@ -10,17 +10,13 @@
     <meta name="apple-mobile-web-app-title" content="SGT Manager">
     <meta name="mobile-web-app-capable" content="yes">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; background-color: #f4f6f9; padding: 15px; margin: 0; color: #333; }
         .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0px 10px 30px rgba(0,0,0,0.06); position: relative; }
-        
         #pwaInstallBtn { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; border: none; padding: 10px; font-size: 12px; border-radius: 8px; font-weight: bold; width: 100%; margin-bottom: 15px; display: none; cursor: pointer; text-transform: uppercase; }
-        
-        /* 🔑 MANUAL TOKEN LIVE TYPE MATCH ZONE */
         .manual-entry-zone { margin-top: 15px; padding: 15px; background: #e9ecef; border-radius: 12px; border: 1px dashed #ced4da; }
         .manual-entry-zone label { font-size: 11px; font-weight: bold; color: #495057; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         .manual-input { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; box-sizing: border-box; text-align: center; font-weight: bold; letter-spacing: 1px; margin: 0; }
@@ -74,12 +70,6 @@
         .back-footer { font-size: 7px; font-weight: bold; color: #2a5298; text-transform: uppercase; border-top: 1px solid #eee; width: 100%; padding-top: 4px; }
 
         .video-box { width: 100%; height: 160px; background: #000; border-radius: 10px; margin-top: 8px; margin-bottom: 5px; display: none; object-fit: cover; border: 2px solid #ced4da; }
-        #reader { width: 100%; border-radius: 16px; overflow: hidden; background: #000; margin-top: 15px; }
-
-        @media screen and (max-width: 640px) {
-            .scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
-            .a4-container-frame { margin: 10px 0; transform-origin: top left; }
-        }
     </style>
 </head>
 <body>
@@ -87,10 +77,9 @@
     <button id="pwaInstallBtn" onclick="triggerPwaInstall()">📲 Install App Shortcut (Jotform Style)</button>
 
     <h2>SOFTWIRE ID MANAGER</h2>
-    <div id="reader"></div>
 
     <div class="manual-entry-zone" id="manualLoginZone">
-        <label>Scan Card QR or Type Security Passcode Below</label>
+        <label>Type Security Passcode Below to Enter Panel</label>
         <input type="text" id="securityCodeInput" class="manual-input" placeholder="Type Here..." oninput="checkLiveCodeMatch(this)">
     </div>
 
@@ -236,7 +225,7 @@
 </div>
 
 <script>
-let html5QrCode; let localStream = null; let deferredPrompt;
+let localStream = null; let deferredPrompt;
 let uploadedLogoBase64 = ""; let uploadedOwnerPhotoBase64 = ""; let uploadedSigBase64 = "";
 let currentClientCompany = ""; let currentClientCity = ""; let currentClientMob = ""; let globalSystemUrl = "";
 let currentClientSlogan = "";
@@ -253,21 +242,20 @@ function handleFile(e, callback) {
     reader.onloadend = function() { callback(reader.result); }; if (file) reader.readAsDataURL(file);
 }
 
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+        window.location.reload();
+    }
+});
+
 window.addEventListener('DOMContentLoaded', () => {
-    html5QrCode = new Html5Qrcode("reader");
-    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, onScanSuccess, () => {});
-    
     if (!('contacts' in navigator && 'ContactsManager' in window)) {
         document.getElementById('selectContactBtn').style.display = 'none';
     }
     
-    // Auto login check if device hardware fingerprint token already exists locally
     if(localStorage.getItem("SGT_MASTER_DEVICE_LOCK") === "AUTHORIZED_AZEEM") {
         document.getElementById("manualLoginZone").style.display = "none";
-        setTimeout(() => {
-            if(html5QrCode.isScanning) { html5QrCode.stop(); document.getElementById("reader").style.display = "none"; }
-            document.getElementById("superAdminPanel").style.display = "block";
-        }, 500);
+        document.getElementById("superAdminPanel").style.display = "block";
     }
 });
 
@@ -286,37 +274,12 @@ function triggerPwaInstall() {
     }
 }
 
-// ⚡ AUTOMATIC INPUT CHARACTER LISTENER MATCH MECHANISM (NO BUTTON NEEDED)
 function checkLiveCodeMatch(element) {
     let rawVal = element.value.trim().toUpperCase();
-    
     if (rawVal === "AZEEM-SUPER") {
-        // Step 1: Lock and Register this specific mobile device permanently
         localStorage.setItem("SGT_MASTER_DEVICE_LOCK", "AUTHORIZED_AZEEM");
-        
-        // Step 2: Open Interface seamlessly
         document.getElementById("manualLoginZone").style.display = "none";
-        if(html5QrCode.isScanning) { html5QrCode.stop(); document.getElementById("reader").style.display = "none"; }
         document.getElementById("superAdminPanel").style.display = "block";
-    } else if (rawVal.includes("CLIENT-LOG-")) {
-        // Dynamic client loop verification pass
-        let cleanedToken = rawVal.replace("CLIENT-LOG-", "");
-        console.log("Token validation stream.");
-    }
-}
-
-function onScanSuccess(decodedText) {
-    html5QrCode.stop(); document.getElementById("reader").style.display = "none";
-    document.getElementById("manualLoginZone").style.display = "none";
-    if(decodedText.includes("AZEEM-SUPER")) {
-        localStorage.setItem("SGT_MASTER_DEVICE_LOCK", "AUTHORIZED_AZEEM"); // Lock master device on scan too
-        document.getElementById("superAdminPanel").style.display = "block";
-    } else if(decodedText.includes("CLIENT-LOG-")) {
-        let data = JSON.parse(decodedText.replace("CLIENT-LOG-", ""));
-        currentClientCompany = data.comp; currentClientCity = data.city; currentClientMob = data.mob; currentClientSlogan = data.slogan || "";
-        document.getElementById("clientAdminPanel").style.display = "block";
-        document.getElementById("adminTitle").innerText = data.comp + " Dashboard";
-        if(data.logo && data.logo !== "NO") { let img = document.getElementById("clientPanelLogo"); img.src = data.logo; img.style.display = "block"; }
     }
 }
 
@@ -338,7 +301,7 @@ async function getMobileContact() {
             }
         }
     } catch (ex) {
-        console.log("Contact system interface API wrapper active.");
+         console.log("Contact API active.");
     }
 }
 
@@ -446,27 +409,31 @@ function createStaffBadge() {
 }
 
 function downloadCardAsImage() {
-    let target = document.getElementById("printableCardsArea");
-    html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 595, height: 842, scrollX: 0, scrollY: 0 }).then(canvas => {
-        let link = document.createElement("a");
-        link.download = (document.getElementById("cardHolderName").innerText || "SGT_Card") + "_A4_Sheet.png";
-        link.href = canvas.toDataURL("image/png"); link.click();
-    });
+    stopActiveStream(); // Ensure hardware camera release lock triggers flawlessly
+    setTimeout(() => {
+        let target = document.getElementById("printableCardsArea");
+        html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 595, height: 842, scrollX: 0, scrollY: 0 }).then(canvas => {
+            let link = document.createElement("a");
+            link.download = (document.getElementById("cardHolderName").innerText || "SGT_Card") + "_A4_Sheet.png";
+            link.href = canvas.toDataURL("image/png"); link.click();
+        });
+    }, 300);
 }
 
-// Crisp Direct 1:1 Injected Data Stream PDF Generator Engine
 function downloadDirectPDF() {
-    let target = document.getElementById("printableCardsArea");
-    html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 595, height: 842 }).then(canvas => {
-        const imgData = canvas.toDataURL('image/jpeg', 0.9);
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'pt', 'a4');
-        pdf.addImage(imgData, 'JPEG', 0, 0, 595, 842);
-        pdf.save((document.getElementById("cardHolderName").innerText || "SGT_Identity") + "_Document.pdf");
-    });
+    stopActiveStream(); // Force absolute baseline camera stream detachment
+    setTimeout(() => {
+        let target = document.getElementById("printableCardsArea");
+        html2canvas(target, { scale: 2, useCORS: true, logging: false, width: 595, height: 842 }).then(canvas => {
+            const imgData = canvas.toDataURL('image/jpeg', 0.9);
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'pt', 'a4');
+            pdf.addImage(imgData, 'JPEG', 0, 0, 595, 842);
+            pdf.save((document.getElementById("cardHolderName").innerText || "SGT_Identity") + "_Document.pdf");
+        });
+    }, 300);
 }
 
-// Pure Text Stream Sync for clean WhatsApp interactions without forced downloads
 function shareOnWhatsAppOnlyText() {
     let rawMob = document.getElementById("phoneCode").value + document.getElementById("clientMobile").value;
     let cleanMob = rawMob.replace(/[^0-9]/g, "");
