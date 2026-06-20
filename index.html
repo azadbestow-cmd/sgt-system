@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SGT Central Secure Scanner</title>
     
+    <!-- PWA App Launcher Shortcut Icons Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SGT Scanner">
     <meta name="mobile-web-app-capable" content="yes">
     
+    <!-- Html5Qrcode Library via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     
     <style>
@@ -24,7 +26,6 @@
         /* 📷 CAMERA SCANNER WINDOW FRAME */
         #reader { width: 100%; border-radius: 16px; overflow: hidden; background: #000; border: 3px solid #1e3c72; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); position: relative; }
         
-        /* Loading Status Box */
         .status-box { background: #fff3cd; padding: 12px; border-radius: 10px; font-size: 12px; font-weight: bold; color: #856404; margin-top: 15px; border: 1px solid #ffeeba; }
         
         .manual-box { margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 12px; border: 1px dashed #ced4da; }
@@ -33,20 +34,23 @@
 </head>
 <body>
 <div class="container">
+    <!-- PWA Installation Icon Trigger -->
     <button id="pwaInstallBtn" onclick="triggerPwaInstall()">📲 Install Scanner App Shortcut</button>
 
     <h2>SGT SECURE SCANNER</h2>
-    <p>Point Mobile Camera at Identity Card Back QR Code</p>
+    <p>Scan Identity Card or Enter Secure Token/Passcode</p>
 
+    <!-- Real-time Active Camera Stream Display Frame -->
     <div id="reader"></div>
 
     <div class="status-box" id="scannerStatus">
         📷 Camera initializing, please grant permission...
     </div>
 
+    <!-- Universal Entry Passcode / Backup Fail-Safe Zone -->
     <div class="manual-box">
-        <label style="font-size: 10px; font-weight: bold; color: #495057; display: block; margin-bottom: 6px; text-transform: uppercase;">Or Enter Manual Token Reference</label>
-        <input type="text" id="manualTokenInput" class="manual-input" placeholder="Type Token Code Here..." oninput="checkManualTokenInput(this)">
+        <label style="font-size: 10px; font-weight: bold; color: #495057; display: block; margin-bottom: 6px; text-transform: uppercase;">Universal Access Passcode / Token Input</label>
+        <input type="text" id="manualTokenInput" class="manual-input" placeholder="Enter Token or Passcode..." oninput="checkUniversalGateInput(this)">
     </div>
 </div>
 
@@ -56,17 +60,15 @@ let deferredPrompt;
 
 window.addEventListener('pageshow', function (event) {
     if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-        window.location.reload(); // Force refresh on back navigation to clear cache stream
+        window.location.reload(); 
     }
 });
 
 window.addEventListener('DOMContentLoaded', () => {
-    // Initialize central hardware camera stream scanner engine instantly
     html5QrCode = new Html5Qrcode("reader");
     
     Html5Qrcode.getCameras().then(cameras => {
         if (cameras && cameras.length) {
-            // Auto start using primary environmental back lens flawlessly
             html5QrCode.start(
                 { facingMode: "environment" }, 
                 { fps: 15, qrbox: 250 },
@@ -99,49 +101,60 @@ function triggerPwaInstall() {
     }
 }
 
-// 🎯 HIGH-SECURITY QR DATA VERIFICATION & ROUTING CONTROLLER
 function onScanSuccess(decodedText) {
-    html5QrCode.stop(); // Immediately release camera lens hardware lock
-    document.getElementById("scannerStatus").innerText = "🔄 Verifying Identity Token...";
-    
+    html5QrCode.stop(); 
+    document.getElementById("scannerStatus").innerText = "🔄 Verifying Security Token...";
     processRoutingAuthentication(decodedText);
 }
 
 function onScanFailure(error) {
-    // Silent failure logging to maintain smooth high fps loop processing
+    // Continuous quiet framework processing loop
 }
 
-function checkManualTokenInput(element) {
+// 👑 UNIVERSAL GATE CONTROLLER (AAP KA PASSCODE AUR CLIENT TOKENS CODES)
+function checkUniversalGateInput(element) {
     let rawVal = element.value.trim().toUpperCase();
+    
+    // [1] SECURE SUPER-ADMIN TRIGGER: Agar aapne apna secret code dala to direct bypass
+    if (rawVal === "AZEEM-SUPER") {
+        if(html5QrCode.isScanning) { html5QrCode.stop(); }
+        document.getElementById("scannerStatus").innerText = "👑 Welcome Super-Admin. Accessing Master Node...";
+        setTimeout(() => {
+            window.location.href = "qrcode.html";
+        }, 800);
+        return;
+    }
+    
+    // [2] CLIENT QR REFERENCE FALLBACK ENTRY
     if(rawVal.startsWith("SGT-CEO-") || rawVal.includes("CLIENT-LOG-")) {
         if(html5QrCode.isScanning) { html5QrCode.stop(); }
         processRoutingAuthentication(rawVal);
     }
 }
 
-// 🎛️ DYNAMIC SAAS ROUTING LOGIC ENGINE
+// 🎛️ MULTI-TENANT SaaS AUTOMATIC ROUTING ENGINE
 function processRoutingAuthentication(dataString) {
     if (dataString.includes("CLIENT-LOG-")) {
-        // 👑 VALID CEO CARD SCANNED: Extract complete encrypted metadata payload
+        // 👑 CLIENT (CEO) DATA PACKET SCANNED
         try {
             let cleanJSONString = dataString.replace("CLIENT-LOG-", "");
             let extractedClient = JSON.parse(cleanJSONString);
             
-            // Set dynamic global memory session state parameters
             localStorage.setItem("SGT_CURRENT_CLIENT_SESSION", JSON.stringify(extractedClient));
-            
-            // Route seamlessly to corporate dashboard injection path with token protection
             window.location.href = `dashboard.html?token=${extractedClient.token}`;
         } catch(e) {
-            alert("Invalid Encryption Data Block Matrix.");
+            alert("Invalid Encryption Data Matrix Cluster.");
             window.location.reload();
         }
+    } else if (dataString.startsWith("AZEEM-SUPER-CARD-MOCK")) {
+        // Master Admin Badge entry routing shortcut
+        window.location.href = "qrcode.html";
     } else if (dataString.includes("STAFF-FRONT-") || dataString.includes("STAFF-")) {
-        // 🛠️ WORKER CARD SCANNED: Extract name/role parameters and route to user-gate
+        // 🛠️ WORKER/TECHNICIAN CARD SCANNED
         localStorage.setItem("SGT_ACTIVE_WORKER_SCAN", dataString);
         window.location.href = `user-gate.html`;
     } else {
-        alert("Security Alert: Unknown Identity Document Scan Blocked.");
+        alert("Security Alert: Unknown Document Source Terminated.");
         window.location.reload();
     }
 }
