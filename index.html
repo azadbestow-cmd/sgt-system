@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGT Central Secure Scanner</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SGT Scanner">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; background-color: #f4f6f9; padding: 15px; margin: 0; color: #333; }
+        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0px 10px 30px rgba(0,0,0,0.06); position: relative; box-sizing: border-box; }
+        
+        #pwaInstallBtn { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; border: none; padding: 12px; font-size: 11px; border-radius: 8px; font-weight: bold; width: 100%; margin-bottom: 20px; display: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        h2 { color: #1e3c72; font-size: 20px; margin-top: 0; margin-bottom: 5px; font-weight: 800; text-transform: uppercase; }
+        p { font-size: 12px; color: #6c757d; margin-bottom: 20px; font-weight: 600; }
+        
+        /* 📷 CAMERA SCANNER WINDOW FRAME */
+        #reader { width: 100%; border-radius: 16px; overflow: hidden; background: #000; border: 3px solid #1e3c72; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); position: relative; }
+        
+        /* Loading Status Box */
+        .status-box { background: #fff3cd; padding: 12px; border-radius: 10px; font-size: 12px; font-weight: bold; color: #856404; margin-top: 15px; border: 1px solid #ffeeba; }
+        
+        .manual-box { margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 12px; border: 1px dashed #ced4da; }
+        .manual-input { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; box-sizing: border-box; text-align: center; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <button id="pwaInstallBtn" onclick="triggerPwaInstall()">📲 Install Scanner App Shortcut</button>
+
+    <h2>SGT SECURE SCANNER</h2>
+    <p>Point Mobile Camera at Identity Card Back QR Code</p>
+
+    <div id="reader"></div>
+
+    <div class="status-box" id="scannerStatus">
+        📷 Camera initializing, please grant permission...
+    </div>
+
+    <div class="manual-box">
+        <label style="font-size: 10px; font-weight: bold; color: #495057; display: block; margin-bottom: 6px; text-transform: uppercase;">Or Enter Manual Token Reference</label>
+        <input type="text" id="manualTokenInput" class="manual-input" placeholder="Type Token Code Here..." oninput="checkManualTokenInput(this)">
+    </div>
+</div>
+
+<script>
+let html5QrCode;
+let deferredPrompt;
+
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+        window.location.reload(); // Force refresh on back navigation to clear cache stream
+    }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    // Initialize central hardware camera stream scanner engine instantly
+    html5QrCode = new Html5Qrcode("reader");
+    
+    Html5Qrcode.getCameras().then(cameras => {
+        if (cameras && cameras.length) {
+            // Auto start using primary environmental back lens flawlessly
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 15, qrbox: 250 },
+                onScanSuccess,
+                onScanFailure
+            ).then(() => {
+                document.getElementById("scannerStatus").style.background = "#d4edda";
+                document.getElementById("scannerStatus").style.color = "#155724";
+                document.getElementById("scannerStatus").style.borderColor = "#c3e6cb";
+                document.getElementById("scannerStatus").innerText = "🎯 Scanner Active & Ready";
+            });
+        }
+    }).catch(err => {
+        document.getElementById("scannerStatus").innerText = "❌ Camera Initialization Failed.";
+    });
+});
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); deferredPrompt = e;
+    document.getElementById('pwaInstallBtn').style.display = 'block';
+});
+
+function triggerPwaInstall() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') { document.getElementById('pwaInstallBtn').style.display = 'none'; }
+            deferredPrompt = null;
+        });
+    }
+}
+
+// 🎯 HIGH-SECURITY QR DATA VERIFICATION & ROUTING CONTROLLER
+function onScanSuccess(decodedText) {
+    html5QrCode.stop(); // Immediately release camera lens hardware lock
+    document.getElementById("scannerStatus").innerText = "🔄 Verifying Identity Token...";
+    
+    processRoutingAuthentication(decodedText);
+}
+
+function onScanFailure(error) {
+    // Silent failure logging to maintain smooth high fps loop processing
+}
+
+function checkManualTokenInput(element) {
+    let rawVal = element.value.trim().toUpperCase();
+    if(rawVal.startsWith("SGT-CEO-") || rawVal.includes("CLIENT-LOG-")) {
+        if(html5QrCode.isScanning) { html5QrCode.stop(); }
+        processRoutingAuthentication(rawVal);
+    }
+}
+
+// 🎛️ DYNAMIC SAAS ROUTING LOGIC ENGINE
+function processRoutingAuthentication(dataString) {
+    if (dataString.includes("CLIENT-LOG-")) {
+        // 👑 VALID CEO CARD SCANNED: Extract complete encrypted metadata payload
+        try {
+            let cleanJSONString = dataString.replace("CLIENT-LOG-", "");
+            let extractedClient = JSON.parse(cleanJSONString);
+            
+            // Set dynamic global memory session state parameters
+            localStorage.setItem("SGT_CURRENT_CLIENT_SESSION", JSON.stringify(extractedClient));
+            
+            // Route seamlessly to corporate dashboard injection path with token protection
+            window.location.href = `dashboard.html?token=${extractedClient.token}`;
+        } catch(e) {
+            alert("Invalid Encryption Data Block Matrix.");
+            window.location.reload();
+        }
+    } else if (dataString.includes("STAFF-FRONT-") || dataString.includes("STAFF-")) {
+        // 🛠️ WORKER CARD SCANNED: Extract name/role parameters and route to user-gate
+        localStorage.setItem("SGT_ACTIVE_WORKER_SCAN", dataString);
+        window.location.href = `user-gate.html`;
+    } else {
+        alert("Security Alert: Unknown Identity Document Scan Blocked.");
+        window.location.reload();
+    }
+}
+</script>
+</body>
+</html>
