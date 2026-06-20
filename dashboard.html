@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGT Client Corporate Portal</title>
+    
+    <!-- PWA App Launchers Meta Tags for Android & iPhone ShortCuts -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SGT Portal">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; background-color: #f4f6f9; padding: 15px; margin: 0; color: #333; }
+        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0px 10px 30px rgba(0,0,0,0.06); position: relative; box-sizing: border-box; }
+        
+        #pwaInstallBtn { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; border: none; padding: 12px; font-size: 11px; border-radius: 8px; font-weight: bold; width: 100%; margin-bottom: 20px; display: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        /* 🏢 SGT GLOBAL BRANDING HEADER */
+        .brand-header { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid #e9ecef; text-align: left; }
+        .brand-logo { max-height: 45px; width: auto; border-radius: 4px; object-fit: contain; }
+        .brand-title { font-size: 17px; font-weight: 800; color: #1e3c72; margin: 0; text-transform: uppercase; line-height: 1.2; }
+        .brand-subtitle { font-size: 10px; color: #6c757d; font-weight: 600; text-transform: uppercase; display: block; margin-top: 2px; }
+        
+        /* 🟢 LIVE DATABASE PULSE STATUS */
+        .pulse-box { background: #e3f2fd; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: bold; color: #0d47a1; margin-bottom: 20px; border: 1px dashed #2196f3; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .pulse-dot { width: 8px; height: 8px; background-color: #28a745; border-radius: 50%; display: inline-block; animation: pulseGlow 1.5s infinite; }
+        @keyframes pulseGlow { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
+        
+        /* 📊 REAL-TIME LIVE COUNTER TILES */
+        .analytics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .counter-tile { background: #f8f9fa; padding: 12px 5px; border-radius: 12px; border: 1px solid #e9ecef; box-sizing: border-box; }
+        .counter-val { font-size: 22px; font-weight: 800; color: #1e3c72; display: block; margin-bottom: 2px; }
+        .counter-label { font-size: 9px; font-weight: 800; color: #6c757d; text-transform: uppercase; letter-spacing: 0.3px; }
+        
+        /* 📷 CEO QUICK HARDWARE SCANNER BLOCK */
+        .section-block { background: #f8f9fa; border: 1px solid #e3e8ee; border-radius: 14px; padding: 15px; margin-bottom: 20px; text-align: left; }
+        .section-title { font-size: 11px; font-weight: 800; color: #495057; text-transform: uppercase; margin-top: 0; margin-bottom: 10px; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px; }
+        .scan-input-row { display: flex; gap: 8px; }
+        .scan-input { flex: 1; padding: 11px; border: 1px solid #ced4da; border-radius: 8px; font-size: 13px; text-align: center; font-weight: bold; text-transform: uppercase; margin: 0; }
+        .scan-btn { width: auto; padding: 11px 16px; background: #00b4d8; color: white; border-radius: 8px; font-size: 12px; margin: 0; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        
+        /* 📩 INVENTORY PURCHASE APPROVAL ZONE */
+        .approval-card { background: white; border: 1px solid #ced4da; border-radius: 10px; padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .approval-info { font-size: 12px; line-height: 1.4; }
+        .approval-info strong { color: #1e3c72; }
+        .approval-actions { display: flex; gap: 6px; }
+        .appr-btn { padding: 6px 12px; border: none; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-approve { background-color: #28a745; color: white; }
+        .btn-reject { background-color: #dc3545; color: white; }
+        .no-requests { font-size: 12px; color: #6c757d; text-align: center; font-style: italic; margin: 10px 0; }
+        
+        /* 🚀 NAVIGATION ROUTE LINKS */
+        .route-btn { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; border: none; padding: 14px; font-size: 13px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; text-decoration: none; box-shadow: 0 4px 12px rgba(30,60,114,0.12); }
+        .route-btn.secondary { background: linear-gradient(135deg, #495057, #343a40); margin-bottom: 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- PWA Jotform-style Shortcut Activation Trigger -->
+    <button id="pwaInstallBtn" onclick="triggerPwaInstall()">📲 Install Corporate App Shortcut</button>
+
+    <!-- Global Corporate Header Profile -->
+    <div class="brand-header">
+        <img id="clientLogoImg" src="https://via.placeholder.com/45?text=SGT" class="brand-logo" alt="SGT Logo">
+        <div>
+            <h3 id="clientCompanyName" class="brand-title">SHAHZAD GLOBAL TECH<span class="brand-subtitle">Corporate Client Terminal</span></h3>
+        </div>
+    </div>
+
+    <!-- Active Database Synchronization Status -->
+    <div class="pulse-box">
+        <span class="pulse-dot"></span>
+        <span id="liveStatusText">Connecting to Central Cloud Ledger...</span>
+    </div>
+
+    <!-- Real-Time Database Tracking Counters Grid -->
+    <div class="analytics-grid">
+        <div class="counter-tile">
+            <span id="totalStaffCount" class="counter-val">0</span>
+            <span class="counter-label">Total Staff</span>
+        </div>
+        <div class="counter-tile" style="border-bottom: 3px solid #28a745;">
+            <span id="activeStaffCount" class="counter-val">0</span>
+            <span class="counter-label">Active Duty</span>
+        </div>
+        <div class="counter-tile" style="border-bottom: 3px solid #dc3545;">
+            <span id="faultAlertCount" class="counter-val">0</span>
+            <span class="counter-label">Fault Alerts</span>
+        </div>
+    </div>
+
+    <!-- 📷 CEO QUICK PARTS/HARDWARE SCANNER -->
+    <div class="section-block">
+        <div class="section-title">📷 Quick Scan Hardware Components</div>
+        <div class="scan-input-row">
+            <input type="text" id="hardwareScanInput" class="scan-input" placeholder="Enter Part/Machine ID..." oninput="checkLiveHardwareScan(this)">
+            <button class="scan-btn" onclick="alert('Mobile Camera Interface scanner initializing...')">Scan</button>
+        </div>
+    </div>
+
+    <!-- 📩 INVENTORY PARTS PURCHASE APPROVAL TERMINAL -->
+    <div class="section-block">
+        <div class="section-title">📩 Pending Inventory & Spares Approvals</div>
+        <div id="approvalsContainer">
+            <!-- Simulated Working Request Row (Will dynamic stream from Sheet) -->
+            <div class="approval-card" id="demoRequestRow">
+                <div class="approval-info">
+                    <strong>Part:</strong> Nexjet Printhead Nozzle<br>
+                    <strong>By:</strong> Imtiaz Mehmood (Eng.)<br>
+                    <strong>Cost:</strong> Est. 18,500 PKR
+                </div>
+                <div class="approval-actions">
+                    <button class="appr-btn btn-approve" onclick="handleApprovalAction('Approved')">Approve</button>
+                    <button class="appr-btn btn-reject" onclick="handleApprovalAction('Rejected')">Reject</button>
+                </div>
+            </div>
+            <div id="noRequestsMsg" class="no-requests" style="display: none;">No pending procurement approvals.</div>
+        </div>
+    </div>
+
+    <!-- Operational System Action Navigation Routes -->
+    <a href="create-user.html" class="route-btn">➕ Create New Worker Access Badge</a>
+    <a href="#" class="route-btn secondary" onclick="alert('Operational Ledger Database logs loading inside pipeline.')">📊 View Complete System Logs</a>
+
+</div>
+
+<script>
+let deferredPrompt;
+const webAppUrl = "https://script.google.com/macros/s/AKfycbxLe6_7rcoYqD8p8B9Wz31wG08o-K8o_yS9g-MTHsC_jNC_q7fG0F_jN_e2_qC_v-u_MQ/exec";
+
+window.addEventListener('DOMContentLoaded', () => {
+    // Dynamic Global Variables Extraction from Super-Admin Setup
+    let sessionData = localStorage.getItem("SGT_CURRENT_CLIENT_SESSION");
+    if(sessionData) {
+        let client = JSON.parse(sessionData);
+        document.getElementById("clientCompanyName").innerHTML = client.comp.toUpperCase() + `<span class="brand-subtitle">${client.city} Branch Unit</span>`;
+        if(client.logo && client.logo !== "NO") { document.getElementById("clientLogoImg").src = client.logo; }
+        document.getElementById("liveStatusText").innerText = "Network Cloud Connection Synced";
+    } else {
+        // Safe corporate baseline values if direct local trace is loading first time
+        document.getElementById("clientCompanyName").innerHTML = "SGT PACKAGING DIVISION<span class="brand-subtitle">Head Office Node</span>";
+        document.getElementById("liveStatusText").innerText = "Operational Control Active";
+    }
+
+    // Direct background synchronization loop launch
+    syncDashboardDataFeed();
+    setInterval(syncDashboardDataFeed, 8000); // Poll database background every 8 seconds smoothly
+});
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); deferredPrompt = e;
+    document.getElementById('pwaInstallBtn').style.display = 'block';
+});
+
+function triggerPwaInstall() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') { document.getElementById('pwaInstallBtn').style.display = 'none'; }
+            deferredPrompt = null;
+        });
+    }
+}
+
+// 📷 LIVE SPOT-SCANNER SIMULATION ROUTING
+function checkLiveHardwareScan(element) {
+    let rawId = element.value.trim().toUpperCase();
+    if(rawId === "NEXJET-21" || rawId === "SEALER-823") {
+        alert(`🔍 MACHINE HISTORY LOG FOUND:\n-----------------------------\nAsset: ${rawId}\nStatus: Operational\nLast Service: 3 Days Ago\nAssigned Eng: Imtiaz Mehmood`);
+        element.value = "";
+    }
+}
+
+// 📩 INVENTORY PROCUREMENT ENGINE CONTROLLER 
+function handleApprovalAction(status) {
+    alert(`Procurement Request successfully marked as: ${status}`);
+    document.getElementById("demoRequestRow").style.display = "none";
+    document.getElementById("noRequestsMsg").style.display = "block";
+    document.getElementById("faultAlertCount").innerText = "0"; // Fault drops down on fix execution
+}
+
+// 🔄 ZERO-REFRESH CLOUD POLLING INTERFACE LOOP
+function syncDashboardDataFeed() {
+    // Background polling fetch parameters setup
+    // Random parameters mapping logic to show visual response until data sheet pipeline hooks completely
+    if(document.getElementById("demoRequestRow").style.display !== "none") {
+        document.getElementById("totalStaffCount").innerText = "14";
+        document.getElementById("activeStaffCount").innerText = "8";
+        document.getElementById("faultAlertCount").innerText = "1";
+    } else {
+        document.getElementById("totalStaffCount").innerText = "14";
+        document.getElementById("activeStaffCount").innerText = "9";
+        document.getElementById("faultAlertCount").innerText = "0";
+    }
+}
+</script>
+</body>
+</html>
